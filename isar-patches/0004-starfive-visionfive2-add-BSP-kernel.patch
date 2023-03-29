@@ -1,0 +1,87 @@
+From 2706bb2a5769f80d1858d9cd8400f9d57e753995 Mon Sep 17 00:00:00 2001
+From: Felix Moessbauer <felix.moessbauer@siemens.com>
+Date: Mon, 23 Jan 2023 13:50:50 +0000
+Subject: [PATCH 4/8] starfive-visionfive2: add BSP kernel
+
+This patch adds the kernel (including configuration) from the
+SDK package. To make this kernel build on gcc12, we add a patch
+that fixes the machine model.
+
+Signed-off-by: Felix Moessbauer <felix.moessbauer@siemens.com>
+---
+ ...or-unrecognized-opcode-csrr-a5-0xc01.patch | 26 +++++++++++++++++++
+ .../linux/files/starfive2_extra.cfg           |  3 +++
+ .../linux/linux-starfive_5.15-visionfive2.bb  | 18 +++++++++++++
+ 3 files changed, 47 insertions(+)
+ create mode 100644 meta-isar/recipes-kernel/linux/files/fix-Error-unrecognized-opcode-csrr-a5-0xc01.patch
+ create mode 100644 meta-isar/recipes-kernel/linux/files/starfive2_extra.cfg
+ create mode 100644 meta-isar/recipes-kernel/linux/linux-starfive_5.15-visionfive2.bb
+
+diff --git a/meta-isar/recipes-kernel/linux/files/fix-Error-unrecognized-opcode-csrr-a5-0xc01.patch b/meta-isar/recipes-kernel/linux/files/fix-Error-unrecognized-opcode-csrr-a5-0xc01.patch
+new file mode 100644
+index 00000000..b4dcaf0d
+--- /dev/null
++++ b/meta-isar/recipes-kernel/linux/files/fix-Error-unrecognized-opcode-csrr-a5-0xc01.patch
+@@ -0,0 +1,26 @@
++From 2f75442523e4b44bdea4ae5bc2e95137d0303c8b Mon Sep 17 00:00:00 2001
++From: LIChengGang <43427321+Zeno-sole@users.noreply.github.com>
++Date: Thu, 12 Jan 2023 10:52:05 +0800
++Subject: [PATCH] fix: Error unrecognized opcode `csrr a5,0xc01
++
++---
++ arch/riscv/Makefile | 6 ++++++
++ 1 file changed, 6 insertions(+)
++
++diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
++index 0eb4568fbd290..c18d87212177b 100644
++--- a/arch/riscv/Makefile
+++++ b/arch/riscv/Makefile
++@@ -52,6 +52,12 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:= rv32ima
++ riscv-march-$(CONFIG_ARCH_RV64I)	:= rv64ima
++ riscv-march-$(CONFIG_FPU)		:= $(riscv-march-y)fd
++ riscv-march-$(CONFIG_RISCV_ISA_C)	:= $(riscv-march-y)c
+++
+++# Newer binutils versions default to ISA spec version 20191213 which moves some
+++# instructions from the I extension to the Zicsr and Zifencei extensions.
+++toolchain-need-zicsr-zifencei := $(call cc-option-yn, -march=$(riscv-march-y)_zicsr_zifencei)
+++riscv-march-$(toolchain-need-zicsr-zifencei) := $(riscv-march-y)_zicsr_zifencei
+++
++ KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
++ KBUILD_AFLAGS += -march=$(riscv-march-y)
++ 
+diff --git a/meta-isar/recipes-kernel/linux/files/starfive2_extra.cfg b/meta-isar/recipes-kernel/linux/files/starfive2_extra.cfg
+new file mode 100644
+index 00000000..d11c28de
+--- /dev/null
++++ b/meta-isar/recipes-kernel/linux/files/starfive2_extra.cfg
+@@ -0,0 +1,3 @@
++# additional configuration to support stock debian userlands
++CONFIG_BINFMT_MISC=y
++CONFIG_SQUASHFS=m
+diff --git a/meta-isar/recipes-kernel/linux/linux-starfive_5.15-visionfive2.bb b/meta-isar/recipes-kernel/linux/linux-starfive_5.15-visionfive2.bb
+new file mode 100644
+index 00000000..8f1d0a81
+--- /dev/null
++++ b/meta-isar/recipes-kernel/linux/linux-starfive_5.15-visionfive2.bb
+@@ -0,0 +1,18 @@
++#
++# Copyright (c) Siemens AG, 2023
++#
++# SPDX-License-Identifier: MIT
++
++require recipes-kernel/linux/linux-custom.inc
++
++SRC_URI += " \
++    git://github.com/starfive-tech/linux.git;protocol=https;branch=JH7110_VisionFive2_devel;destsuffix=linux-visionfive-${PV} \
++    file://fix-Error-unrecognized-opcode-csrr-a5-0xc01.patch \
++    file://starfive2_extra.cfg"
++SRCREV = "59cf9af678dbfa3d73f6cb86ed1ae7219da9f5c9"
++
++S = "${WORKDIR}/linux-visionfive-${PV}"
++
++KERNEL_DEFCONFIG = "starfive_visionfive2_defconfig"
++
++LINUX_VERSION_EXTENSION = "-isar"
+-- 
+2.34.1
+

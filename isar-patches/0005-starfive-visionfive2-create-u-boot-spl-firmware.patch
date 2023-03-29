@@ -1,0 +1,111 @@
+From 0bc68f8166c56b8869f843cd3c2e6f50b695d4d6 Mon Sep 17 00:00:00 2001
+From: Felix Moessbauer <felix.moessbauer@siemens.com>
+Date: Tue, 24 Jan 2023 11:04:48 +0000
+Subject: [PATCH 5/8] starfive-visionfive2: create u-boot-spl firmware
+
+Signed-off-by: Felix Moessbauer <felix.moessbauer@siemens.com>
+---
+ .../jh7110-u-boot-spl-image/files/install     |  1 +
+ .../jh7110-u-boot-spl-image/files/rules       | 13 ++++++++
+ .../jh7110-u-boot-spl-image_0.1.bb            | 30 +++++++++++++++++++
+ .../jh7110-u-boot-spl-tool_0.1.bb             | 23 ++++++++++++++
+ 4 files changed, 67 insertions(+)
+ create mode 100644 meta-isar/recipes-bsp/jh7110-u-boot-spl-image/files/install
+ create mode 100644 meta-isar/recipes-bsp/jh7110-u-boot-spl-image/files/rules
+ create mode 100644 meta-isar/recipes-bsp/jh7110-u-boot-spl-image/jh7110-u-boot-spl-image_0.1.bb
+ create mode 100644 meta-isar/recipes-bsp/jh7110-u-boot-spl-tool/jh7110-u-boot-spl-tool_0.1.bb
+
+diff --git a/meta-isar/recipes-bsp/jh7110-u-boot-spl-image/files/install b/meta-isar/recipes-bsp/jh7110-u-boot-spl-image/files/install
+new file mode 100644
+index 00000000..c300f842
+--- /dev/null
++++ b/meta-isar/recipes-bsp/jh7110-u-boot-spl-image/files/install
+@@ -0,0 +1 @@
++u-boot-spl.bin.normal.out usr/share/jh7110-uboot-spl-image
+diff --git a/meta-isar/recipes-bsp/jh7110-u-boot-spl-image/files/rules b/meta-isar/recipes-bsp/jh7110-u-boot-spl-image/files/rules
+new file mode 100644
+index 00000000..3c28b2c0
+--- /dev/null
++++ b/meta-isar/recipes-bsp/jh7110-u-boot-spl-image/files/rules
+@@ -0,0 +1,13 @@
++#!/usr/bin/make -f
++
++U_BOOT_SPL_BIN := /usr/lib/u-boot/starfive-visionfive2/u-boot-spl.bin
++# taken from https://github.com/starfive-tech/Tools
++OFFSET := 0x01010101
++
++override_dh_auto_build:
++	cp $(U_BOOT_SPL_BIN) u-boot-spl.bin
++	/usr/lib/jh7110-uboot-spl-tool/jh7110_uboot_spl u-boot-spl.bin $(OFFSET)
++	mv u-boot-spl.bin.out u-boot-spl.bin.normal.out
++
++%:
++	dh \$@
+diff --git a/meta-isar/recipes-bsp/jh7110-u-boot-spl-image/jh7110-u-boot-spl-image_0.1.bb b/meta-isar/recipes-bsp/jh7110-u-boot-spl-image/jh7110-u-boot-spl-image_0.1.bb
+new file mode 100644
+index 00000000..08c53b51
+--- /dev/null
++++ b/meta-isar/recipes-bsp/jh7110-u-boot-spl-image/jh7110-u-boot-spl-image_0.1.bb
+@@ -0,0 +1,30 @@
++#
++# Copyright (c) Siemens AG, 2023
++#
++# SPDX-License-Identifier: MIT
++
++inherit dpkg
++
++SRC_URI = "file://rules file://install"
++
++DESCRIPTION = "StarFive VisionFive 2 u-boot SPL"
++DEPENDS = "jh7110-u-boot-spl-tool u-boot-starfive-visionfive2"
++DEBIAN_BUILD_DEPENDS = "jh7110-u-boot-spl-tool, u-boot-starfive-visionfive2:${DISTRO_ARCH}"
++
++# this is a host tool
++PACKAGE_ARCH = "${HOST_ARCH}"
++
++do_prepare_build[cleandirs] += "${S}/debian"
++do_prepare_build(){
++    deb_debianize
++    cp ${WORKDIR}/install ${S}/debian/
++}
++
++do_deploy() {
++    dpkg --fsys-tarfile ${WORKDIR}/jh7110-u-boot-spl-image_${PV}*.deb | \
++        tar xOf - "./usr/share/jh7110-uboot-spl-image/u-boot-spl.bin.normal.out" \
++        > "${DEPLOY_DIR_IMAGE}/u-boot-spl.bin.normal.out"
++}
++
++addtask deploy after do_dpkg_build before do_build
++do_deploy[dirs] = "${DEPLOY_DIR_IMAGE}"
+diff --git a/meta-isar/recipes-bsp/jh7110-u-boot-spl-tool/jh7110-u-boot-spl-tool_0.1.bb b/meta-isar/recipes-bsp/jh7110-u-boot-spl-tool/jh7110-u-boot-spl-tool_0.1.bb
+new file mode 100644
+index 00000000..1991e61a
+--- /dev/null
++++ b/meta-isar/recipes-bsp/jh7110-u-boot-spl-tool/jh7110-u-boot-spl-tool_0.1.bb
+@@ -0,0 +1,23 @@
++#
++# Copyright (c) Siemens AG, 2023
++#
++# SPDX-License-Identifier: MIT
++
++inherit dpkg
++
++DESCRIPTION = "replacement for proprietary VisionFive2 SDK spl_tool"
++LICENSE = "CPL-1"
++
++SRC_URI = "git://github.com/electrorys/jh7110_uboot_spl.git;branch=master;protocol=https;destsuffix=jh7110-uboot-spl"
++SRCREV = "e089116b902240659c1dcd6cbb6537dc4c1e316c"
++
++S = "${WORKDIR}/jh7110-uboot-spl"
++
++# This is a host tool
++PACKAGE_ARCH = "${HOST_ARCH}"
++
++do_prepare_build[cleandirs] += "${S}/debian"
++do_prepare_build(){
++    deb_debianize
++    echo "jh7110_uboot_spl usr/lib/jh7110-uboot-spl-tool" > ${S}/debian/${PN}.install
++}
+-- 
+2.34.1
+

@@ -1,0 +1,25 @@
+From a8782352681ae06b606a6d122ae6035d4a7baa2e Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Wed, 29 Mar 2023 10:43:39 +0200
+Subject: [PATCH] visionfive2: Allow to overwrite DTB_FILES
+
+The name of the DTB may differ if an alternative kernel is used.
+
+Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
+---
+ meta-isar/conf/machine/starfive-visionfive2.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meta-isar/conf/machine/starfive-visionfive2.conf b/meta-isar/conf/machine/starfive-visionfive2.conf
+index a07b064..98aecaa 100644
+--- a/meta-isar/conf/machine/starfive-visionfive2.conf
++++ b/meta-isar/conf/machine/starfive-visionfive2.conf
+@@ -26,4 +26,4 @@ IMAGE_INSTALL += "expand-on-first-boot"
+ # DTB file for OpenSBI
+ DTB_UBOOT_JH7110_VF2 = "starfive_visionfive2.dtb"
+ # DTB file for booting
+-DTB_FILES = "starfive/jh7110-visionfive-v2.dtb"
++DTB_FILES ?= "starfive/jh7110-visionfive-v2.dtb"
+-- 
+2.34.1
+
