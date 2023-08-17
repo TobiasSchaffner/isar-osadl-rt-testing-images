@@ -16,7 +16,7 @@ repos:
   starfive-visionfive2-rt-isar:
 
   isar:
-    url: https://github.com/isar/isar.git
+    url: https://github.com/ilbers/isar.git
     refspec: 4de8b0d5d68ad46829fa1360eabcf3fc8662a39e
     patches:
       0001-u-boot-inject-debian-multi-arch-config.patch:
