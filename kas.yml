@@ -9,8 +9,8 @@ header:
 build_system: isar
 
 machine: starfive-visionfive2
-distro: debian-sid-ports
-target: isar-image-base
+distro: debian-sid
+target: osadl-test-image
 
 repos:
   starfive-visionfive2-rt-isar:
