@@ -1,0 +1,260 @@
+From 1ac0775bb23362a17465c8626462aa0d98c36770 Mon Sep 17 00:00:00 2001
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Date: Sun, 4 Jun 2023 18:21:08 +0200
+Subject: [PATCH 4/5] meta-isar: starfive-visionfive2: Switch to upstream
+ U-Boot
+
+There are no more reasons to use the vendor tree, upcoming U-Boot
+2023.07 will sufficiently support the board. There is just currently one
+regression after -rc2, so stick with that intermediate version for now.
+
+Moving upstream allows for significant simplifications in the build. We
+are now building OpenSBI first and are then using U-Boot to finish all
+artifacts needed for the image.
+
+The wks file is updated accordingly, switching the GUID of the U-Boot
+partition to the one upstream is recomending. Unneeded options for the
+first two partitions are dropped at this chance.
+
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ .../conf/machine/starfive-visionfive2.conf    | 12 ++-----
+ .../opensbi/files/starfive-visionfive2-rules  | 12 +++++++
+ .../files/starfive-visionfive2-rules.tmpl     | 17 ---------
+ ...ensbi-starfive-visionfive2_1.2+20230310.bb | 11 ++----
+ .../files/starfive-visionfive2-rules.tmpl     | 35 +++++++++++++++++++
+ ...-starfive-visionfive2_2021.10+VF2-3.0.4.bb | 31 ----------------
+ ...u-boot-starfive-visionfive2_2023.07-rc2.bb | 26 ++++++++++++++
+ .../canned-wks/starfive-visionfive2.wks.in    |  4 +--
+ 8 files changed, 79 insertions(+), 69 deletions(-)
+ create mode 100644 meta-isar/recipes-bsp/opensbi/files/starfive-visionfive2-rules
+ delete mode 100644 meta-isar/recipes-bsp/opensbi/files/starfive-visionfive2-rules.tmpl
+ create mode 100755 meta-isar/recipes-bsp/u-boot/files/starfive-visionfive2-rules.tmpl
+ delete mode 100644 meta-isar/recipes-bsp/u-boot/u-boot-starfive-visionfive2_2021.10+VF2-3.0.4.bb
+ create mode 100644 meta-isar/recipes-bsp/u-boot/u-boot-starfive-visionfive2_2023.07-rc2.bb
+
+diff --git a/meta-isar/conf/machine/starfive-visionfive2.conf b/meta-isar/conf/machine/starfive-visionfive2.conf
+index dcab8542..c0f61f46 100644
+--- a/meta-isar/conf/machine/starfive-visionfive2.conf
++++ b/meta-isar/conf/machine/starfive-visionfive2.conf
+@@ -10,18 +10,10 @@ KERNEL_NAME ?= "starfive"
+ PREFERRED_PROVIDER_u-boot-starfive-visionfive2 = "u-boot-starfive-visionfive2"
+ 
+ IMAGE_FSTYPES ?= "wic"
+-
+ WKS_FILE ?= "starfive-visionfive2.wks.in"
+-IMAGER_INSTALL += " \
+-    jh7110-u-boot-spl-image \
+-    visionfive2-u-boot-firmware \
+-    ${SYSTEMD_BOOTLOADER_INSTALL}"
+-IMAGER_BUILD_DEPS += " \
+-    jh7110-u-boot-spl-image \
+-    visionfive2-u-boot-firmware"
++IMAGER_INSTALL += " u-boot-starfive-visionfive2 ${SYSTEMD_BOOTLOADER_INSTALL}"
++IMAGER_BUILD_DEPS += "u-boot-starfive-visionfive2"
+ 
+-# DTB file for OpenSBI
+-DTB_UBOOT_JH7110_VF2 = "starfive_visionfive2.dtb"
+ # DTB file for booting
+ DTB_VISIONFIVE2 = "jh7110-visionfive-v2.dtb"
+ DTB_FILES = "starfive/${DTB_VISIONFIVE2}"
+diff --git a/meta-isar/recipes-bsp/opensbi/files/starfive-visionfive2-rules b/meta-isar/recipes-bsp/opensbi/files/starfive-visionfive2-rules
+new file mode 100644
+index 00000000..452ff356
+--- /dev/null
++++ b/meta-isar/recipes-bsp/opensbi/files/starfive-visionfive2-rules
+@@ -0,0 +1,12 @@
++#!/usr/bin/make -f
++
++ifneq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
++export CROSS_COMPILE=$(DEB_HOST_GNU_TYPE)-
++endif
++
++override_dh_auto_build:
++	CFLAGS= LDFLAGS= $(MAKE) $(PARALLEL_MAKE) \
++		PLATFORM=generic FW_TEXT_START=0x40000000 FW_OPTIONS=0
++
++%:
++	dh $@
+diff --git a/meta-isar/recipes-bsp/opensbi/files/starfive-visionfive2-rules.tmpl b/meta-isar/recipes-bsp/opensbi/files/starfive-visionfive2-rules.tmpl
+deleted file mode 100644
+index 5f35c1c2..00000000
+--- a/meta-isar/recipes-bsp/opensbi/files/starfive-visionfive2-rules.tmpl
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#!/usr/bin/make -f
+-
+-ifneq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
+-export CROSS_COMPILE=$(DEB_HOST_GNU_TYPE)-
+-endif
+-
+-UBOOT_DTB_FILE := /usr/share/u-boot/starfive-visionfive2/${DTB_UBOOT_JH7110_VF2}
+-FW_TEXT_START := 0x40000000
+-
+-override_dh_auto_build:
+-	CFLAGS= LDFLAGS= $(MAKE) $(PARALLEL_MAKE) PLATFORM=generic \
+-		FW_PAYLOAD_PATH=/usr/lib/u-boot/starfive-visionfive2/u-boot.bin \
+-		FW_FDT_PATH=$(UBOOT_DTB_FILE) \
+-		FW_TEXT_START=$(FW_TEXT_START)
+-
+-%:
+-	dh $@
+diff --git a/meta-isar/recipes-bsp/opensbi/opensbi-starfive-visionfive2_1.2+20230310.bb b/meta-isar/recipes-bsp/opensbi/opensbi-starfive-visionfive2_1.2+20230310.bb
+index 86be2932..355a5a38 100644
+--- a/meta-isar/recipes-bsp/opensbi/opensbi-starfive-visionfive2_1.2+20230310.bb
++++ b/meta-isar/recipes-bsp/opensbi/opensbi-starfive-visionfive2_1.2+20230310.bb
+@@ -9,23 +9,16 @@ DESCRIPTION = "OpenSBI firmware for StarFive VisionFive 2"
+ 
+ SRC_URI = " \
+     git://github.com/riscv-software-src/opensbi.git;destsuffix=opensbi-${PV};protocol=https;branch=master \
+-    file://starfive-visionfive2-rules.tmpl"
++    file://starfive-visionfive2-rules"
+ # required patches are not yet part of a release, but will be in 1.3
+ SRCREV = "2868f26131308ff345382084681ea89c5b0159f1"
+ 
+ S = "${WORKDIR}/opensbi-${PV}"
+-TEMPLATE_FILES += "starfive-visionfive2-rules.tmpl"
+-TEMPLATE_VARS += "DTB_UBOOT_JH7110_VF2"
+-
+-DEPENDS = "u-boot-starfive-visionfive2"
+-DEBIAN_BUILD_DEPENDS = " \
+-    u-boot-starfive-visionfive2, \
+-    u-boot-starfive-visionfive2-dev"
+ 
+ do_prepare_build[cleandirs] += "${S}/debian"
+ do_prepare_build() {
+     cp ${WORKDIR}/starfive-visionfive2-rules ${WORKDIR}/rules
+     deb_debianize
+ 
+-    echo "build/platform/generic/firmware/fw_payload.bin /usr/lib/opensbi/starfive-visionfive2/" > ${S}/debian/install
++    echo "build/platform/generic/firmware/fw_dynamic.bin /usr/lib/opensbi/starfive-visionfive2/" > ${S}/debian/install
+ }
+diff --git a/meta-isar/recipes-bsp/u-boot/files/starfive-visionfive2-rules.tmpl b/meta-isar/recipes-bsp/u-boot/files/starfive-visionfive2-rules.tmpl
+new file mode 100755
+index 00000000..01bb9156
+--- /dev/null
++++ b/meta-isar/recipes-bsp/u-boot/files/starfive-visionfive2-rules.tmpl
+@@ -0,0 +1,35 @@
++#!/usr/bin/make -f
++
++# Debian rules for custom U-Boot build
++#
++# This software is a part of ISAR.
++# Copyright (c) Siemens AG, 2018-2021
++#
++# SPDX-License-Identifier: MIT
++
++ifneq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
++export CROSS_COMPILE=$(DEB_HOST_GNU_TYPE)-
++SET_CROSS_BUILD_TOOLS=CROSS_BUILD_TOOLS=y
++endif
++
++override_dh_auto_build:
++	$(MAKE) $(PARALLEL_MAKE) ${U_BOOT_CONFIG}
++	$(MAKE) $(PARALLEL_MAKE) flash.bin OPENSBI=/usr/lib/opensbi/starfive-visionfive2/fw_dynamic.bin
++	spl_tool -c -f spl/u-boot-spl.bin
++	$(MAKE) -n u-boot-initial-env >/dev/null 2>&1; if [ $$? -ne 2 ]; then \
++		$(MAKE) $(PARALLEL_MAKE) u-boot-initial-env; \
++	else \
++		./scripts/get_default_envs.sh >u-boot-initial-env; \
++	fi
++	$(MAKE) $(PARALLEL_MAKE) $(SET_CROSS_BUILD_TOOLS) NO_SDL=1 tools-only envtools
++
++override_dh_auto_install:
++	mv tools/env/lib.a tools/env/libubootenv.a
++
++override_dh_auto_test:
++
++override_dh_strip:
++	dh_strip -X libubootenv.a
++
++%:
++	dh $@ --parallel
+diff --git a/meta-isar/recipes-bsp/u-boot/u-boot-starfive-visionfive2_2021.10+VF2-3.0.4.bb b/meta-isar/recipes-bsp/u-boot/u-boot-starfive-visionfive2_2021.10+VF2-3.0.4.bb
+deleted file mode 100644
+index 1be1080e..00000000
+--- a/meta-isar/recipes-bsp/u-boot/u-boot-starfive-visionfive2_2021.10+VF2-3.0.4.bb
++++ /dev/null
+@@ -1,31 +0,0 @@
+-#
+-# Copyright (c) Siemens AG, 2023
+-#
+-# SPDX-License-Identifier: MIT
+-
+-require recipes-bsp/u-boot/u-boot-custom.inc
+-
+-SRC_URI += "git://github.com/starfive-tech/u-boot.git;nobranch=1;protocol=https;destsuffix=u-boot-${PV}"
+-SRCREV = "b6e2b0e85c774a18ae668223a6e5f7d335895243"
+-
+-DEBIAN_BUILD_DEPENDS .= ", libssl-dev:${DISTRO_ARCH}"
+-# when cross compiling, we need the library on the host as well, as the signature computation is done locally
+-DEBIAN_BUILD_DEPENDS .= "${@ ', libssl-dev:${HOST_ARCH}' if d.getVar('ISAR_CROSS_COMPILE') == '1' else '' }"
+-
+-U_BOOT_CONFIG = "starfive_visionfive2_defconfig"
+-U_BOOT_BIN = "u-boot.bin"
+-U_BOOT_SPL_BIN = "spl/u-boot-spl.bin"
+-
+-S = "${WORKDIR}/u-boot-${PV}"
+-
+-# install dtb files for opensbi
+-do_prepare_build[cleandirs] += "${S}/debian"
+-do_prepare_build:append() {
+-    # also build and install spl component
+-    sed -i 's|${U_BOOT_BIN}|${U_BOOT_BIN} ${U_BOOT_SPL_BIN}|g' ${S}/debian/rules
+-    echo "${U_BOOT_SPL_BIN} usr/lib/u-boot/${MACHINE}/" \
+-        >> ${S}/debian/u-boot-${MACHINE}.install
+-    # install device tree
+-    echo "arch/riscv/dts/*.dtb usr/share/u-boot/${MACHINE}/" \
+-        >> ${S}/debian/u-boot-${MACHINE}-dev.install
+-}
+diff --git a/meta-isar/recipes-bsp/u-boot/u-boot-starfive-visionfive2_2023.07-rc2.bb b/meta-isar/recipes-bsp/u-boot/u-boot-starfive-visionfive2_2023.07-rc2.bb
+new file mode 100644
+index 00000000..b0a2d126
+--- /dev/null
++++ b/meta-isar/recipes-bsp/u-boot/u-boot-starfive-visionfive2_2023.07-rc2.bb
+@@ -0,0 +1,26 @@
++#
++# Copyright (c) Siemens AG, 2023
++#
++# SPDX-License-Identifier: MIT
++
++require recipes-bsp/u-boot/u-boot-custom.inc
++
++SRC_URI += "https://ftp.denx.de/pub/u-boot/u-boot-${PV}.tar.bz2 \
++    file://starfive-visionfive2-rules.tmpl"
++SRC_URI[sha256sum] = "184d734699803ce741417e90f6fb9fe218f1ce4fce479dc266a34d869e6df8cb"
++
++DEPENDS += "opensbi-${MACHINE} jh7110-u-boot-spl-tool-native"
++DEBIAN_BUILD_DEPENDS .= ", opensbi-${MACHINE}, jh7110-u-boot-spl-tool:native, \
++    swig, python3-dev:native, python3-setuptools, \
++    libssl-dev:${DISTRO_ARCH}, libssl-dev:native"
++
++U_BOOT_CONFIG = "starfive_visionfive2_defconfig"
++U_BOOT_BIN = "u-boot.itb spl/u-boot-spl.bin.normal.out"
++
++TEMPLATE_FILES += "starfive-visionfive2-rules.tmpl"
++
++S = "${WORKDIR}/u-boot-${PV}"
++
++do_prepare_build:append() {
++	cp ${WORKDIR}/starfive-visionfive2-rules ${S}/debian/rules
++}
+diff --git a/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in b/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in
+index 99156f81..ed8a3b71 100644
+--- a/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in
++++ b/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in
+@@ -12,9 +12,9 @@
+ # This is required to boot efi with the correct device tree, which is included in the fit image.
+ 
+ # SPL
+-part --source rawcopy --sourceparams "file=/usr/share/jh7110-uboot-spl-image/u-boot-spl.bin.normal.out" --ondisk mmcblk1 --fixed-size  2M --offset 2M --part-type 2E54B353-1271-4842-806F-E436D6AF6985
++part --source rawcopy --sourceparams "file=/usr/lib/u-boot/starfive-visionfive2/u-boot-spl.bin.normal.out" --fixed-size 2M --part-type 2E54B353-1271-4842-806F-E436D6AF6985
+ # U-Boot FIT
+-part --source rawcopy --sourceparams "file=/usr/share/visionfive2-u-boot-firmware/visionfive2_fw_payload.img" --ondisk mmcblk1 --fixed-size  4M --offset 4M --part-type 5B193300-FC78-40CD-8002-E86C45580B47
++part --source rawcopy --sourceparams "file=/usr/lib/u-boot/starfive-visionfive2/u-boot.itb" --fixed-size 4M --part-type BC13C2FF-59E6-4262-A352-B275FD6F7172
+ # EFI
+ part /boot --source bootimg-efi-isar --sourceparams "loader=systemd-boot,dtb=${DTB_VISIONFIVE2}" --use-uuid --label efi --part-type EF00 --align 1024
+ # rootfs
+-- 
+2.34.1
+

@@ -17,37 +17,28 @@ repos:
 
   isar:
     url: https://github.com/ilbers/isar.git
-    refspec: 4de8b0d5d68ad46829fa1360eabcf3fc8662a39e
+    refspec: ecc7cae423a828d294575301c1584fbe303cba3e
     patches:
-      0001-u-boot-inject-debian-multi-arch-config.patch:
-        path: isar-patches/0001-u-boot-inject-debian-multi-arch-config.patch
+      0001-meta-isar-u-boot-starfive-visionfive2-Fix-fetching-u.patch:
+        path: isar-patches/0001-meta-isar-u-boot-starfive-visionfive2-Fix-fetching-u.patch
         repo: starfive-visionfive2-rt-isar
-      0002-starfive-visionfive2-package-u-boot.patch:
-        path: isar-patches/0002-starfive-visionfive2-package-u-boot.patch
+      0002-meta-isar-starfive-visionfive2-Use-kernel-DTB.patch:
+        path: isar-patches/0002-meta-isar-starfive-visionfive2-Use-kernel-DTB.patch
         repo: starfive-visionfive2-rt-isar
-      0003-starfive-visionfive2-package-opensbi-firmware.patch:
-        path: isar-patches/0003-starfive-visionfive2-package-opensbi-firmware.patch
+      0003-meta-isar-jh7110-u-boot-spl-tool-Rework.patch:
+        path: isar-patches/0003-meta-isar-jh7110-u-boot-spl-tool-Rework.patch
         repo: starfive-visionfive2-rt-isar
-      0004-starfive-visionfive2-add-BSP-kernel.patch:
-        path: isar-patches/0004-starfive-visionfive2-add-BSP-kernel.patch
+      0004-meta-isar-starfive-visionfive2-Switch-to-upstream-U-.patch:
+        path: isar-patches/0004-meta-isar-starfive-visionfive2-Switch-to-upstream-U-.patch
         repo: starfive-visionfive2-rt-isar
-      0005-starfive-visionfive2-create-u-boot-spl-firmware.patch:
-        path: isar-patches/0005-starfive-visionfive2-create-u-boot-spl-firmware.patch
+      0005-meta-isar-starfive-visionfive2-Drop-obsolete-recipes.patch:
+        path: isar-patches/0005-meta-isar-starfive-visionfive2-Drop-obsolete-recipes.patch
         repo: starfive-visionfive2-rt-isar
-      0006-starfive-visionfive2-create-u-boot-spl-FIT-image.patch:
-        path: isar-patches/0006-starfive-visionfive2-create-u-boot-spl-FIT-image.patch
+      0006-visionfive2-Allow-to-overwrite-DTB_FILES.patch:
+        path: isar-patches/0006-visionfive2-Allow-to-overwrite-DTB_FILES.patch
         repo: starfive-visionfive2-rt-isar
-      0007-starfive-visionfive2-add-machine.patch:
-        path: isar-patches/0007-starfive-visionfive2-add-machine.patch
-        repo: starfive-visionfive2-rt-isar
-      0008-replace-custom-OVA-logic-with-imagetype-logic.patch:
-        path: isar-patches/0008-replace-custom-OVA-logic-with-imagetype-logic.patch
-        repo: starfive-visionfive2-rt-isar
-      0009-visionfive2-Allow-to-overwrite-DTB_FILES.patch:
-        path: isar-patches/0009-visionfive2-Allow-to-overwrite-DTB_FILES.patch
-        repo: starfive-visionfive2-rt-isar
-      0010-startfive-visionfive2-Allow-kernel-commandline-tuning.patch:
-        path: isar-patches/0010-startfive-visionfive2-Allow-kernel-commandline-tuning.patch
+      0007-startfive-visionfive2-Allow-kernel-commandline-tuning.patch:
+        path: isar-patches/0007-startfive-visionfive2-Allow-kernel-commandline-tuning.patch
         repo: starfive-visionfive2-rt-isar
     layers:
       meta:
