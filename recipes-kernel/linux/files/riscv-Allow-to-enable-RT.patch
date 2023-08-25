@@ -1,0 +1,27 @@
+From 36249456ae140a81d00eb411f498548ec77f1e6f Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Fri, 25 Aug 2023 16:11:26 +0200
+Subject: [PATCH 3/3] riscv: Allow to enable RT
+
+Now, it's ready to enable RT on riscv.
+
+Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+---
+ arch/riscv/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 72151dd25ce0..33011fac6e2e 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -36,6 +36,7 @@ config RISCV
+ 	select ARCH_SUPPORTS_ATOMIC_RMW
+ 	select ARCH_SUPPORTS_DEBUG_PAGEALLOC if MMU
+ 	select ARCH_SUPPORTS_HUGETLBFS if MMU
++	select ARCH_SUPPORTS_RT
+ 	select ARCH_USE_MEMTEST
+ 	select ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT if MMU
+ 	select ARCH_WANT_FRAME_POINTERS
+-- 
+2.34.1
+

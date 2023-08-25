@@ -1,0 +1,102 @@
+From d123ee3d38a99bf5c7790f0078ffebd775d7381a Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Fri, 25 Aug 2023 22:17:43 +0200
+Subject: [PATCH] Fix riscv64 CONFIG_PM config issues
+
+Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
+---
+ drivers/clocksource/timer-starfive.c                      | 8 ++++----
+ .../img-rogue/services/system/rogue/sf_7110/sysconfig.c   | 6 ++++--
+ drivers/net/wireless/eswin/usb/usb.c                      | 2 --
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/clocksource/timer-starfive.c b/drivers/clocksource/timer-starfive.c
+index 3c7ee9689717..0ee6cc3a704f 100644
+--- a/drivers/clocksource/timer-starfive.c
++++ b/drivers/clocksource/timer-starfive.c
+@@ -140,10 +140,9 @@ static void timer_shutdown(struct starfive_clkevt *clkevt)
+ 	timer_disable(clkevt);
+ }
+ 
+-#ifdef CONFIG_PM_SLEEP
+-
+ static void starfive_timer_suspend(struct clocksource *cs)
+ {
++#ifdef CONFIG_PM_SLEEP
+ 	struct starfive_clkevt *clkevt;
+ 	struct clk *pclk;
+ 
+@@ -177,10 +176,12 @@ static void starfive_timer_suspend(struct clocksource *cs)
+ 		if (clkevt->misc->clk_count < 1)
+ 			clk_disable_unprepare(pclk);
+ 	}
++#endif /*CONIFG PM SLEEP*/
+ }
+ 
+ static void starfive_timer_resume(struct clocksource *cs)
+ {
++#ifdef CONFIG_PM_SLEEP
+ 	struct starfive_clkevt *clkevt;
+ 
+ 	clkevt = to_starfive_clksrc(cs);
+@@ -200,9 +201,8 @@ static void starfive_timer_resume(struct clocksource *cs)
+ 	timer_set_reload(clkevt);
+ 	timer_int_enable(clkevt);
+ 	timer_enable(clkevt);
+-}
+-
+ #endif /*CONIFG PM SLEEP*/
++}
+ 
+ static int starfive_timer_shutdown(struct clock_event_device *evt)
+ {
+diff --git a/drivers/gpu/drm/img/img-rogue/services/system/rogue/sf_7110/sysconfig.c b/drivers/gpu/drm/img/img-rogue/services/system/rogue/sf_7110/sysconfig.c
+index fbb5e93148fb..36a5c4226a83 100644
+--- a/drivers/gpu/drm/img/img-rogue/services/system/rogue/sf_7110/sysconfig.c
++++ b/drivers/gpu/drm/img/img-rogue/services/system/rogue/sf_7110/sysconfig.c
+@@ -224,18 +224,20 @@ void SysDevHost_Cache_Maintenance(IMG_HANDLE hSysData,
+ 
+ static IMG_UINT32 sys_gpu_runtime_resume(IMG_HANDLE hd)
+ {
++#ifdef CONFIG_STARFIVE_PMU
+ 	starfive_pmu_hw_event_turn_off_mask(0);
+ 	clk_prepare_enable(sf_cfg_t.clk_axi);
+ 	u0_img_gpu_enable();
+-
++#endif
+ 	return 0;
+ }
+ 
+ static IMG_UINT32 sys_gpu_runtime_suspend(IMG_HANDLE hd)
+ {
++#ifdef CONFIG_STARFIVE_PMU
+ 	u0_img_gpu_disable();
+ 	starfive_pmu_hw_event_turn_off_mask((uint32_t)-1);
+-
++#endif
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/wireless/eswin/usb/usb.c b/drivers/net/wireless/eswin/usb/usb.c
+index ddfda8e338b1..3eaf3f1c98b1 100644
+--- a/drivers/net/wireless/eswin/usb/usb.c
++++ b/drivers/net/wireless/eswin/usb/usb.c
+@@ -729,7 +729,6 @@ static int usb_hif_wait_ack(struct eswin *tr, void* data, const u32 len)
+ 	return usb_bulk_msg(infac_data->udev, pipe->usb_pipe_handle, data, len, NULL, 20000);
+ }
+ 
+-#ifdef CONFIG_PM
+ static int usb_hif_suspend(struct eswin *tr)
+ {
+ 	return -EOPNOTSUPP;
+@@ -739,7 +738,6 @@ static int usb_hif_resume(struct eswin *tr)
+ {
+ 	return -EOPNOTSUPP;
+ }
+-#endif
+ 
+ static struct usb_ops eswin_usb_hif_ops = {
+ 	.xmit			= usb_hif_xmit,
+-- 
+2.34.1
+

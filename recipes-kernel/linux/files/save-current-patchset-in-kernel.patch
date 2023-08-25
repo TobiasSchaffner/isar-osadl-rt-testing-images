@@ -45,11 +45,11 @@ Signed-off-by: Carsten Emde <C.Emde@osadl.org>
  scripts/extract-ikpatchset |   68 ++++++++++++++++++++++++++++++
  4 files changed, 229 insertions(+)
 
-Index: linux-6.1.12-rt6/init/Kconfig
+Index: linux-5.15.2-rt19/init/Kconfig
 ===================================================================
---- linux-6.1.12-rt6.orig/init/Kconfig
-+++ linux-6.1.12-rt6/init/Kconfig
-@@ -703,6 +703,47 @@ config IKCONFIG_PROC
+--- linux-5.15.2-rt19.orig/init/Kconfig
++++ linux-5.15.2-rt19/init/Kconfig
+@@ -700,6 +700,47 @@ config IKCONFIG_PROC
  	  This option enables access to the kernel configuration file
  	  through /proc/config.gz.
  
@@ -97,19 +97,19 @@ Index: linux-6.1.12-rt6/init/Kconfig
  config IKHEADERS
  	tristate "Enable kernel headers through /sys/kernel/kheaders.tar.xz"
  	depends on SYSFS
-Index: linux-6.1.12-rt6/kernel/Makefile
+Index: linux-5.15.2-rt19/kernel/Makefile
 ===================================================================
---- linux-6.1.12-rt6.orig/kernel/Makefile
-+++ linux-6.1.12-rt6/kernel/Makefile
-@@ -79,6 +79,7 @@ obj-$(CONFIG_UTS_NS) += utsname.o
+--- linux-5.15.2-rt19.orig/kernel/Makefile
++++ linux-5.15.2-rt19/kernel/Makefile
+@@ -83,6 +83,7 @@ obj-$(CONFIG_UTS_NS) += utsname.o
  obj-$(CONFIG_USER_NS) += user_namespace.o
  obj-$(CONFIG_PID_NS) += pid_namespace.o
  obj-$(CONFIG_IKCONFIG) += configs.o
 +obj-$(CONFIG_IKPATCHSET) += patchset.o
  obj-$(CONFIG_IKHEADERS) += kheaders.o
  obj-$(CONFIG_SMP) += stop_machine.o
- obj-$(CONFIG_AUDIT) += audit.o auditfilter.o
-@@ -148,6 +149,25 @@ filechk_cat = cat $<
+ obj-$(CONFIG_KPROBES_SANITY_TEST) += test_kprobes.o
+@@ -151,6 +152,25 @@ filechk_cat = cat $<
  $(obj)/config_data: $(KCONFIG_CONFIG) FORCE
  	$(call filechk,cat)
  
@@ -135,10 +135,10 @@ Index: linux-6.1.12-rt6/kernel/Makefile
  $(obj)/kheaders.o: $(obj)/kheaders_data.tar.xz
  
  quiet_cmd_genikh = CHK     $(obj)/kheaders_data.tar.xz
-Index: linux-6.1.12-rt6/kernel/patchset.c
+Index: linux-5.15.2-rt19/kernel/patchset.c
 ===================================================================
 --- /dev/null
-+++ linux-6.1.12-rt6/kernel/patchset.c
++++ linux-5.15.2-rt19/kernel/patchset.c
 @@ -0,0 +1,100 @@
 +/*
 + * kernel/patchset.c
@@ -240,10 +240,10 @@ Index: linux-6.1.12-rt6/kernel/patchset.c
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Carsten Emde");
 +MODULE_DESCRIPTION("Save the current patchset in the kernel");
-Index: linux-6.1.12-rt6/scripts/extract-ikpatchset
+Index: linux-5.15.2-rt19/scripts/extract-ikpatchset
 ===================================================================
 --- /dev/null
-+++ linux-6.1.12-rt6/scripts/extract-ikpatchset
++++ linux-5.15.2-rt19/scripts/extract-ikpatchset
 @@ -0,0 +1,68 @@
 +#!/bin/sh
 +# ----------------------------------------------------------------------

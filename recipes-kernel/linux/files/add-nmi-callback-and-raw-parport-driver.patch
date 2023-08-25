@@ -26,13 +26,13 @@ Signed-off-by: Carsten Emde <C.Emde@osadl.org>
  kernel/trace/trace_syscalls.c |    3 
  11 files changed, 559 insertions(+)
 
-Index: linux-6.1.12-rt6/drivers/misc/Kconfig
+Index: linux-5.15.2-rt19/drivers/misc/Kconfig
 ===================================================================
---- linux-6.1.12-rt6.orig/drivers/misc/Kconfig
-+++ linux-6.1.12-rt6/drivers/misc/Kconfig
-@@ -496,6 +496,72 @@ config VCPU_STALL_DETECTOR
- 
- 	  If you do not intend to run this kernel as a guest, say N.
+--- linux-5.15.2-rt19.orig/drivers/misc/Kconfig
++++ linux-5.15.2-rt19/drivers/misc/Kconfig
+@@ -470,6 +470,72 @@ config HISI_HIKEY_USB
+ 	  switching between the dual-role USB-C port and the USB-A host ports
+ 	  using only one USB controller.
  
 +config SETPARPORT_RAW
 +	tristate "Raw output driver for parallel port"
@@ -103,10 +103,10 @@ Index: linux-6.1.12-rt6/drivers/misc/Kconfig
  source "drivers/misc/c2port/Kconfig"
  source "drivers/misc/eeprom/Kconfig"
  source "drivers/misc/cb710/Kconfig"
-Index: linux-6.1.12-rt6/drivers/misc/Makefile
+Index: linux-5.15.2-rt19/drivers/misc/Makefile
 ===================================================================
---- linux-6.1.12-rt6.orig/drivers/misc/Makefile
-+++ linux-6.1.12-rt6/drivers/misc/Makefile
+--- linux-5.15.2-rt19.orig/drivers/misc/Makefile
++++ linux-5.15.2-rt19/drivers/misc/Makefile
 @@ -35,6 +35,7 @@ obj-$(CONFIG_C2PORT)		+= c2port/
  obj-$(CONFIG_HMC6352)		+= hmc6352.o
  obj-y				+= eeprom/
@@ -115,10 +115,10 @@ Index: linux-6.1.12-rt6/drivers/misc/Makefile
  obj-$(CONFIG_VMWARE_BALLOON)	+= vmw_balloon.o
  obj-$(CONFIG_PCH_PHUB)		+= pch_phub.o
  obj-y				+= ti-st/
-Index: linux-6.1.12-rt6/drivers/misc/setparport.c
+Index: linux-5.15.2-rt19/drivers/misc/setparport.c
 ===================================================================
 --- /dev/null
-+++ linux-6.1.12-rt6/drivers/misc/setparport.c
++++ linux-5.15.2-rt19/drivers/misc/setparport.c
 @@ -0,0 +1,468 @@
 +/*
 + * setparport - set bits of the parallel port by writing immediately
@@ -588,11 +588,11 @@ Index: linux-6.1.12-rt6/drivers/misc/setparport.c
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Carsten Emde <C.Emde@osadl.org>");
 +MODULE_DESCRIPTION("Install NMI call and set/get parallel port w/o device IRQ");
-Index: linux-6.1.12-rt6/fs/super.c
+Index: linux-5.15.2-rt19/fs/super.c
 ===================================================================
---- linux-6.1.12-rt6.orig/fs/super.c
-+++ linux-6.1.12-rt6/fs/super.c
-@@ -1034,6 +1034,7 @@ void emergency_thaw_all(void)
+--- linux-5.15.2-rt19.orig/fs/super.c
++++ linux-5.15.2-rt19/fs/super.c
+@@ -1005,6 +1005,7 @@ void emergency_thaw_all(void)
  		schedule_work(work);
  	}
  }
@@ -600,11 +600,11 @@ Index: linux-6.1.12-rt6/fs/super.c
  
  static DEFINE_IDA(unnamed_dev_ida);
  
-Index: linux-6.1.12-rt6/fs/sync.c
+Index: linux-5.15.2-rt19/fs/sync.c
 ===================================================================
---- linux-6.1.12-rt6.orig/fs/sync.c
-+++ linux-6.1.12-rt6/fs/sync.c
-@@ -142,6 +142,8 @@ void emergency_sync(void)
+--- linux-5.15.2-rt19.orig/fs/sync.c
++++ linux-5.15.2-rt19/fs/sync.c
+@@ -154,6 +154,8 @@ void emergency_sync(void)
  		schedule_work(work);
  	}
  }
@@ -613,11 +613,11 @@ Index: linux-6.1.12-rt6/fs/sync.c
  
  /*
   * sync a single super
-Index: linux-6.1.12-rt6/include/linux/hardirq.h
+Index: linux-5.15.2-rt19/include/linux/hardirq.h
 ===================================================================
---- linux-6.1.12-rt6.orig/include/linux/hardirq.h
-+++ linux-6.1.12-rt6/include/linux/hardirq.h
-@@ -101,6 +101,8 @@ void irq_exit_rcu(void);
+--- linux-5.15.2-rt19.orig/include/linux/hardirq.h
++++ linux-5.15.2-rt19/include/linux/hardirq.h
+@@ -109,6 +109,8 @@ extern void rcu_nmi_exit(void);
   * be marked 'notrace' and call nmi_enter() as soon as possible.
   */
  
@@ -626,7 +626,7 @@ Index: linux-6.1.12-rt6/include/linux/hardirq.h
  /*
   * nmi_enter() can nest up to 15 times; see NMI_BITS.
   */
-@@ -110,6 +112,8 @@ void irq_exit_rcu(void);
+@@ -118,6 +120,8 @@ extern void rcu_nmi_exit(void);
  		arch_nmi_enter();				\
  		BUG_ON(in_nmi() == NMI_MASK);			\
  		__preempt_count_add(NMI_OFFSET + HARDIRQ_OFFSET);	\
@@ -635,23 +635,23 @@ Index: linux-6.1.12-rt6/include/linux/hardirq.h
  	} while (0)
  
  #define nmi_enter()						\
-Index: linux-6.1.12-rt6/include/linux/interrupt.h
+Index: linux-5.15.2-rt19/include/linux/interrupt.h
 ===================================================================
---- linux-6.1.12-rt6.orig/include/linux/interrupt.h
-+++ linux-6.1.12-rt6/include/linux/interrupt.h
-@@ -860,4 +860,6 @@ extern int arch_early_irq_init(void);
+--- linux-5.15.2-rt19.orig/include/linux/interrupt.h
++++ linux-5.15.2-rt19/include/linux/interrupt.h
+@@ -780,4 +780,6 @@ extern int arch_early_irq_init(void);
  
  #define __softirq_entry  __section(".softirqentry.text")
  
 +void set_nmicallback(void (*new_nmicallback)(void));
 +
  #endif
-Index: linux-6.1.12-rt6/kernel/irq/handle.c
+Index: linux-5.15.2-rt19/kernel/irq/handle.c
 ===================================================================
---- linux-6.1.12-rt6.orig/kernel/irq/handle.c
-+++ linux-6.1.12-rt6/kernel/irq/handle.c
-@@ -17,6 +17,10 @@
- #include <asm/irq_regs.h>
+--- linux-5.15.2-rt19.orig/kernel/irq/handle.c
++++ linux-5.15.2-rt19/kernel/irq/handle.c
+@@ -15,6 +15,10 @@
+ #include <linux/kernel_stat.h>
  
  #include <trace/events/irq.h>
 +EXPORT_TRACEPOINT_SYMBOL_GPL(irq_handler_entry);
@@ -661,11 +661,11 @@ Index: linux-6.1.12-rt6/kernel/irq/handle.c
  
  #include "internals.h"
  
-Index: linux-6.1.12-rt6/kernel/irq/manage.c
+Index: linux-5.15.2-rt19/kernel/irq/manage.c
 ===================================================================
---- linux-6.1.12-rt6.orig/kernel/irq/manage.c
-+++ linux-6.1.12-rt6/kernel/irq/manage.c
-@@ -2844,6 +2844,13 @@ int irq_get_irqchip_state(unsigned int i
+--- linux-5.15.2-rt19.orig/kernel/irq/manage.c
++++ linux-5.15.2-rt19/kernel/irq/manage.c
+@@ -2824,6 +2824,13 @@ int irq_get_irqchip_state(unsigned int i
  }
  EXPORT_SYMBOL_GPL(irq_get_irqchip_state);
  
@@ -679,11 +679,11 @@ Index: linux-6.1.12-rt6/kernel/irq/manage.c
  /**
   *	irq_set_irqchip_state - set the state of a forwarded interrupt.
   *	@irq: Interrupt line that is forwarded to a VM
-Index: linux-6.1.12-rt6/kernel/sched/core.c
+Index: linux-5.15.2-rt19/kernel/sched/core.c
 ===================================================================
---- linux-6.1.12-rt6.orig/kernel/sched/core.c
-+++ linux-6.1.12-rt6/kernel/sched/core.c
-@@ -8480,6 +8480,7 @@ static void do_sched_yield(void)
+--- linux-5.15.2-rt19.orig/kernel/sched/core.c
++++ linux-5.15.2-rt19/kernel/sched/core.c
+@@ -8206,6 +8206,7 @@ static void do_sched_yield(void)
  
  	schedule();
  }
@@ -691,10 +691,10 @@ Index: linux-6.1.12-rt6/kernel/sched/core.c
  
  /**
   * sys_sched_yield - yield the current processor to other threads.
-Index: linux-6.1.12-rt6/kernel/trace/trace_syscalls.c
+Index: linux-5.15.2-rt19/kernel/trace/trace_syscalls.c
 ===================================================================
---- linux-6.1.12-rt6.orig/kernel/trace/trace_syscalls.c
-+++ linux-6.1.12-rt6/kernel/trace/trace_syscalls.c
+--- linux-5.15.2-rt19.orig/kernel/trace/trace_syscalls.c
++++ linux-5.15.2-rt19/kernel/trace/trace_syscalls.c
 @@ -13,6 +13,9 @@
  #include "trace_output.h"
  #include "trace.h"

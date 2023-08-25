@@ -39,17 +39,17 @@ Signed-off-by: Carsten Emde <C.Emde@osadl.org>
 
 ---
  init/Kconfig                   |   28 +++++
- kernel/sched/Makefile          |    2 
+ kernel/sched/Makefile          |    1 
  kernel/sched/core.c            |   31 +++++
- kernel/sched/cpu_idleruntime.c |  226 +++++++++++++++++++++++++++++++++++++++++
+ kernel/sched/cpu_idleruntime.c |  225 +++++++++++++++++++++++++++++++++++++++++
  kernel/sched/sched.h           |    8 +
- 5 files changed, 295 insertions(+)
+ 5 files changed, 293 insertions(+)
 
-Index: linux-6.1.12-rt6/init/Kconfig
+Index: linux-5.15.2-rt19/init/Kconfig
 ===================================================================
---- linux-6.1.12-rt6.orig/init/Kconfig
-+++ linux-6.1.12-rt6/init/Kconfig
-@@ -581,6 +581,34 @@ config BSD_PROCESS_ACCT_V3
+--- linux-5.15.2-rt19.orig/init/Kconfig
++++ linux-5.15.2-rt19/init/Kconfig
+@@ -578,6 +578,34 @@ config BSD_PROCESS_ACCT_V3
  	  for processing it. A preliminary version of these tools is available
  	  at <http://www.gnu.org/software/acct/>.
  
@@ -84,21 +84,23 @@ Index: linux-6.1.12-rt6/init/Kconfig
  config TASKSTATS
  	bool "Export task/process statistics through netlink"
  	depends on NET
-Index: linux-6.1.12-rt6/kernel/sched/Makefile
+Index: linux-5.15.2-rt19/kernel/sched/Makefile
 ===================================================================
---- linux-6.1.12-rt6.orig/kernel/sched/Makefile
-+++ linux-6.1.12-rt6/kernel/sched/Makefile
-@@ -32,3 +32,5 @@ obj-y += core.o
- obj-y += fair.o
- obj-y += build_policy.o
- obj-y += build_utility.o
-+obj-y += cpu_idleruntime.o
-+
-Index: linux-6.1.12-rt6/kernel/sched/core.c
+--- linux-5.15.2-rt19.orig/kernel/sched/Makefile
++++ linux-5.15.2-rt19/kernel/sched/Makefile
+@@ -29,6 +29,7 @@ obj-y += wait.o wait_bit.o swait.o compl
+ obj-$(CONFIG_SMP) += cpupri.o cpudeadline.o topology.o stop_task.o pelt.o
+ obj-$(CONFIG_SCHED_AUTOGROUP) += autogroup.o
+ obj-$(CONFIG_SCHEDSTATS) += stats.o
++obj-$(CONFIG_CPU_IDLERUNTIME) += cpu_idleruntime.o
+ obj-$(CONFIG_SCHED_DEBUG) += debug.o
+ obj-$(CONFIG_CGROUP_CPUACCT) += cpuacct.o
+ obj-$(CONFIG_CPU_FREQ) += cpufreq.o
+Index: linux-5.15.2-rt19/kernel/sched/core.c
 ===================================================================
---- linux-6.1.12-rt6.orig/kernel/sched/core.c
-+++ linux-6.1.12-rt6/kernel/sched/core.c
-@@ -5166,6 +5166,37 @@ prepare_task_switch(struct rq *rq, struc
+--- linux-5.15.2-rt19.orig/kernel/sched/core.c
++++ linux-5.15.2-rt19/kernel/sched/core.c
+@@ -4797,6 +4797,37 @@ prepare_task_switch(struct rq *rq, struc
  	kmap_local_sched_out();
  	prepare_task(next);
  	prepare_arch_switch(next);
@@ -136,11 +138,11 @@ Index: linux-6.1.12-rt6/kernel/sched/core.c
  }
  
  /**
-Index: linux-6.1.12-rt6/kernel/sched/cpu_idleruntime.c
+Index: linux-5.15.2-rt19/kernel/sched/cpu_idleruntime.c
 ===================================================================
 --- /dev/null
-+++ linux-6.1.12-rt6/kernel/sched/cpu_idleruntime.c
-@@ -0,0 +1,226 @@
++++ linux-5.15.2-rt19/kernel/sched/cpu_idleruntime.c
+@@ -0,0 +1,225 @@
 +/*
 +   cpu_idleruntime.c: provide CPU usage data based on idle processing
 +
@@ -164,8 +166,7 @@ Index: linux-6.1.12-rt6/kernel/sched/cpu_idleruntime.c
 +#include <linux/seq_file.h>
 +#include <linux/proc_fs.h>
 +#include <linux/cpu.h>
-+#include <linux/sched/clock.h>
-+#include <linux/sched/cputime.h>
++
 +#include "sched.h"
 +
 +DEFINE_PER_CPU(unsigned long long, idlestart);
@@ -251,7 +252,7 @@ Index: linux-6.1.12-rt6/kernel/sched/cpu_idleruntime.c
 +static ssize_t idleruntime_reset(struct file *file, const char __user *buffer,
 +				 size_t len, loff_t *offset)
 +{
-+	unsigned long cpu = (unsigned long) pde_data(file_inode(file));
++	unsigned long cpu = (unsigned long) PDE_DATA(file_inode(file));
 +
 +	idleruntime_reset1(cpu);
 +	return len;
@@ -275,7 +276,7 @@ Index: linux-6.1.12-rt6/kernel/sched/cpu_idleruntime.c
 +
 +static int idleruntime_open_all(struct inode *inode, struct file *file)
 +{
-+	return single_open(file, idleruntime_show_all, pde_data(inode));
++	return single_open(file, idleruntime_show_all, PDE_DATA(inode));
 +}
 +
 +static const struct proc_ops idleruntime_all_proc_ops = {
@@ -288,7 +289,7 @@ Index: linux-6.1.12-rt6/kernel/sched/cpu_idleruntime.c
 +
 +static int idleruntime_open(struct inode *inode, struct file *file)
 +{
-+	return single_open(file, idleruntime_show, pde_data(inode));
++	return single_open(file, idleruntime_show, PDE_DATA(inode));
 +}
 +
 +static const struct proc_ops idleruntime_proc_ops = {
@@ -367,20 +368,20 @@ Index: linux-6.1.12-rt6/kernel/sched/cpu_idleruntime.c
 +}
 +
 +early_initcall(idleruntime_init);
-Index: linux-6.1.12-rt6/kernel/sched/sched.h
+Index: linux-5.15.2-rt19/kernel/sched/sched.h
 ===================================================================
---- linux-6.1.12-rt6.orig/kernel/sched/sched.h
-+++ linux-6.1.12-rt6/kernel/sched/sched.h
-@@ -1681,6 +1681,14 @@ this_rq_lock_irq(struct rq_flags *rf)
+--- linux-5.15.2-rt19.orig/kernel/sched/sched.h
++++ linux-5.15.2-rt19/kernel/sched/sched.h
+@@ -1665,6 +1665,14 @@ this_rq_lock_irq(struct rq_flags *rf)
  	return rq;
  }
  
 +#ifdef CONFIG_CPU_IDLERUNTIME
-+DECLARE_PER_CPU(unsigned long long, idlestart);
-+DECLARE_PER_CPU(unsigned long long, idlestop);
-+DECLARE_PER_CPU(unsigned long long, idletime);
-+DECLARE_PER_CPU(unsigned long long, runtime);
-+DECLARE_PER_CPU(raw_spinlock_t, idleruntime_lock);
++extern DEFINE_PER_CPU(unsigned long long, idlestart);
++extern DEFINE_PER_CPU(unsigned long long, idlestop);
++extern DEFINE_PER_CPU(unsigned long long, idletime);
++extern DEFINE_PER_CPU(unsigned long long, runtime);
++extern DEFINE_PER_CPU(raw_spinlock_t, idleruntime_lock);
 +#endif
 +
  #ifdef CONFIG_NUMA
