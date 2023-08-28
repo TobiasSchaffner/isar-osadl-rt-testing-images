@@ -21,9 +21,9 @@ repos:
       0001-meta-isar-u-boot-starfive-visionfive2-Fix-fetching-u.patch:
         path: isar-patches/0001-meta-isar-u-boot-starfive-visionfive2-Fix-fetching-u.patch
         repo: isar-osadl-rt-testing-images
-      # 0002-meta-isar-starfive-visionfive2-Use-kernel-DTB.patch:
-      #   path: isar-patches/0002-meta-isar-starfive-visionfive2-Use-kernel-DTB.patch
-      #   repo: isar-osadl-rt-testing-images
+      0002-meta-isar-starfive-visionfive2-Use-kernel-DTB.patch:
+        path: isar-patches/0002-meta-isar-starfive-visionfive2-Use-kernel-DTB.patch
+        repo: isar-osadl-rt-testing-images
       # 0003-meta-isar-jh7110-u-boot-spl-tool-Rework.patch:
       #   path: isar-patches/0003-meta-isar-jh7110-u-boot-spl-tool-Rework.patch
       #   repo: isar-osadl-rt-testing-images
