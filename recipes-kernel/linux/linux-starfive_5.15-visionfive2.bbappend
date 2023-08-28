@@ -13,7 +13,7 @@ SRC_URI += "file://patch-5.15-rt17.patch \
 SRC_URI += "file://asm-generic-preempt-also-check-preempt_lazy_count-fo.patch \
             file://riscv-add-lazy-preempt-support.patch \
             file://riscv-Allow-to-enable-RT.patch \
-            file://fix-riscv64-CONFIG_PM-config-issues.patch"
+            file://fix-riscv64-CPNFIG_PM-config-issues-VF2_v2.11.5.patch"
 
 # Add the OSADL add on patches
 SRC_URI += "file://add-nmi-callback-and-raw-parport-driver.patch \
@@ -21,5 +21,3 @@ SRC_URI += "file://add-nmi-callback-and-raw-parport-driver.patch \
             file://net-ipv4-icmp-ping-sysrq.patch \
             file://save-current-patchset-in-kernel.patch \
             file://sched-add-per-cpu-load-measurement.patch"
-
-SRCREV = "8fe323292f2caf46bde0e0aab8f484f920f521be"

@@ -1,6 +1,6 @@
-From d123ee3d38a99bf5c7790f0078ffebd775d7381a Mon Sep 17 00:00:00 2001
+From a563db9e5ac3b91c52a74858705a087dae887f45 Mon Sep 17 00:00:00 2001
 From: Tobias Schaffner <tobias.schaffner@siemens.com>
-Date: Fri, 25 Aug 2023 22:17:43 +0200
+Date: Mon, 28 Aug 2023 11:43:03 +0200
 Subject: [PATCH] Fix riscv64 CONFIG_PM config issues
 
 Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
@@ -11,10 +11,10 @@ Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
  3 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/clocksource/timer-starfive.c b/drivers/clocksource/timer-starfive.c
-index 3c7ee9689717..0ee6cc3a704f 100644
+index 46003d13fa1d..ea313cb23ad2 100644
 --- a/drivers/clocksource/timer-starfive.c
 +++ b/drivers/clocksource/timer-starfive.c
-@@ -140,10 +140,9 @@ static void timer_shutdown(struct starfive_clkevt *clkevt)
+@@ -138,10 +138,9 @@ static void timer_shutdown(struct starfive_clkevt *clkevt)
  	timer_disable(clkevt);
  }
  
@@ -26,7 +26,7 @@ index 3c7ee9689717..0ee6cc3a704f 100644
  	struct starfive_clkevt *clkevt;
  	struct clk *pclk;
  
-@@ -177,10 +176,12 @@ static void starfive_timer_suspend(struct clocksource *cs)
+@@ -175,10 +174,12 @@ static void starfive_timer_suspend(struct clocksource *cs)
  		if (clkevt->misc->clk_count < 1)
  			clk_disable_unprepare(pclk);
  	}
@@ -39,7 +39,7 @@ index 3c7ee9689717..0ee6cc3a704f 100644
  	struct starfive_clkevt *clkevt;
  
  	clkevt = to_starfive_clksrc(cs);
-@@ -200,9 +201,8 @@ static void starfive_timer_resume(struct clocksource *cs)
+@@ -198,9 +199,8 @@ static void starfive_timer_resume(struct clocksource *cs)
  	timer_set_reload(clkevt);
  	timer_int_enable(clkevt);
  	timer_enable(clkevt);
@@ -51,10 +51,10 @@ index 3c7ee9689717..0ee6cc3a704f 100644
  static int starfive_timer_shutdown(struct clock_event_device *evt)
  {
 diff --git a/drivers/gpu/drm/img/img-rogue/services/system/rogue/sf_7110/sysconfig.c b/drivers/gpu/drm/img/img-rogue/services/system/rogue/sf_7110/sysconfig.c
-index fbb5e93148fb..36a5c4226a83 100644
+index 91f7a4de4d4d..c2010175a079 100644
 --- a/drivers/gpu/drm/img/img-rogue/services/system/rogue/sf_7110/sysconfig.c
 +++ b/drivers/gpu/drm/img/img-rogue/services/system/rogue/sf_7110/sysconfig.c
-@@ -224,18 +224,20 @@ void SysDevHost_Cache_Maintenance(IMG_HANDLE hSysData,
+@@ -224,19 +224,21 @@ void SysDevHost_Cache_Maintenance(IMG_HANDLE hSysData,
  
  static IMG_UINT32 sys_gpu_runtime_resume(IMG_HANDLE hd)
  {
@@ -71,6 +71,7 @@ index fbb5e93148fb..36a5c4226a83 100644
  {
 +#ifdef CONFIG_STARFIVE_PMU
  	u0_img_gpu_disable();
+ 	clk_disable_unprepare(sf_cfg_t.clk_axi);
  	starfive_pmu_hw_event_turn_off_mask((uint32_t)-1);
 -
 +#endif
