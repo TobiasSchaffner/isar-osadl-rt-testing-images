@@ -1,0 +1,20 @@
+#
+# Copyright (c) Siemens AG, 2023
+#
+# SPDX-License-Identifier: MIT
+
+header:
+  version: 10
+
+build_system: isar
+
+target: osadl-rt-test-image
+
+local_conf_header:
+  kernel: |
+    IMAGE_KERNEL_CMDLINE_TUNE = "isolcpus=2-3 rcu_nocbs=2-3 nohz_full=2-3 irqaffinity=0-1 tsc=nowatchdog nosoftlockup"
+  users: |
+    USERS += "root"
+    # Development password: root
+    USER_root[password] = "$6$vES27yqp$YVWiGwpxfKPGEiFTVDV4MR1X3.3IxZer5P/Hus/8XT1u/P.tJ8h63W5JxrqOf0tBMMyF55Po2Cf3VtnTiCi/S1"
+    USER_root[shell] = "/bin/bash"

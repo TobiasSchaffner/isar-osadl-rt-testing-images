@@ -1,0 +1,57 @@
+#
+# Copyright (c) Siemens AG, 2023
+#
+# SPDX-License-Identifier: MIT
+
+header:
+  version: 10
+  includes:
+    - kas/osadl-rt-test-image.yml
+
+machine: starfive-visionfive2
+distro: debian-sid-ports
+
+repos:
+  isar-osadl-rt-testing-images:
+
+  isar:
+    url: https://github.com/ilbers/isar.git
+    refspec: ecc7cae423a828d294575301c1584fbe303cba3e
+    patches:
+      0001-meta-isar-u-boot-starfive-visionfive2-Fix-fetching-u.patch:
+        path: isar-patches/0001-meta-isar-u-boot-starfive-visionfive2-Fix-fetching-u.patch
+        repo: isar-osadl-rt-testing-images
+      # 0002-meta-isar-starfive-visionfive2-Use-kernel-DTB.patch:
+      #   path: isar-patches/0002-meta-isar-starfive-visionfive2-Use-kernel-DTB.patch
+      #   repo: isar-osadl-rt-testing-images
+      # 0003-meta-isar-jh7110-u-boot-spl-tool-Rework.patch:
+      #   path: isar-patches/0003-meta-isar-jh7110-u-boot-spl-tool-Rework.patch
+      #   repo: isar-osadl-rt-testing-images
+      # 0004-meta-isar-starfive-visionfive2-Switch-to-upstream-U-.patch:
+      #   path: isar-patches/0004-meta-isar-starfive-visionfive2-Switch-to-upstream-U-.patch
+      #   repo: isar-osadl-rt-testing-images
+      # 0005-meta-isar-starfive-visionfive2-Drop-obsolete-recipes.patch:
+      #   path: isar-patches/0005-meta-isar-starfive-visionfive2-Drop-obsolete-recipes.patch
+      #   repo: isar-osadl-rt-testing-images
+      # 0006-visionfive2-Allow-to-overwrite-DTB_FILES.patch:
+      #   path: isar-patches/0006-visionfive2-Allow-to-overwrite-DTB_FILES.patch
+      #   repo: isar-osadl-rt-testing-images
+      0007-startfive-visionfive2-Allow-kernel-commandline-tuning.patch:
+        path: isar-patches/0007-startfive-visionfive2-Allow-kernel-commandline-tuning.patch
+        repo: isar-osadl-rt-testing-images
+      0008-Add-a-debian-sid-distro-configuration.patch:
+        path: isar-patches/0008-Add-a-debian-sid-distro-configuration.patch
+        repo: isar-osadl-rt-testing-images
+      0009-Initialize-DEB_BUIILD_PROFILES-in-custom-kernel-reci.patch:
+        path: isar-patches/0009-Initialize-DEB_BUIILD_PROFILES-in-custom-kernel-reci.patch
+        repo: isar-osadl-rt-testing-images
+      0010-Allow-to-use-old-snapshots.patch:
+        path: isar-patches/0010-Allow-to-use-old-snapshots.patch
+        repo: isar-osadl-rt-testing-images
+    layers:
+      meta:
+      meta-isar:
+
+local_conf_header:
+  settings:
+    ISAR_CROSS_COMPILE="1"

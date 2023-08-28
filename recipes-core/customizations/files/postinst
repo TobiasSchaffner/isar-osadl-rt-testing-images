@@ -1,0 +1,3 @@
+#!/bin/sh
+
+echo "osadl-rt-test-image" > /etc/hostname

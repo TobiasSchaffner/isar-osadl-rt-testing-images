@@ -1,0 +1,25 @@
+From 83d528fda7103563e7df60d075bc918b16d558bf Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Mon, 28 Aug 2023 09:18:44 +0200
+Subject: [PATCH] Allow to use old snapshots
+
+Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
+---
+ meta/recipes-core/isar-bootstrap/isar-bootstrap.inc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meta/recipes-core/isar-bootstrap/isar-bootstrap.inc b/meta/recipes-core/isar-bootstrap/isar-bootstrap.inc
+index 8af73a9b..ec41f923 100644
+--- a/meta/recipes-core/isar-bootstrap/isar-bootstrap.inc
++++ b/meta/recipes-core/isar-bootstrap/isar-bootstrap.inc
+@@ -379,6 +379,7 @@ do_bootstrap() {
+         fi
+ 
+         chroot "${ROOTFSDIR}" /usr/bin/apt-get update -y \
++                                -o Acquire::Check-Valid-Until=false \
+                                 -o APT::Update::Error-Mode=any
+         chroot "${ROOTFSDIR}" /usr/bin/apt-get install -y -f
+         chroot "${ROOTFSDIR}" /usr/bin/apt-get dist-upgrade -y \
+-- 
+2.34.1
+

@@ -1,0 +1,37 @@
+From eb4f44bc9b3b205b8327bf17f41b560c2ac591fc Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Tue, 22 Aug 2023 12:40:53 +0200
+Subject: [PATCH 1/2] Add a debian sid distro configuration
+
+Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
+---
+ meta/conf/distro/debian-sid.conf | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+ create mode 100644 meta/conf/distro/debian-sid.conf
+
+diff --git a/meta/conf/distro/debian-sid.conf b/meta/conf/distro/debian-sid.conf
+new file mode 100644
+index 00000000..cadff214
+--- /dev/null
++++ b/meta/conf/distro/debian-sid.conf
+@@ -0,0 +1,17 @@
++# This software is a part of ISAR.
++
++require debian-common.conf
++
++BASE_DISTRO_CODENAME = "sid"
++
++HOST_DISTRO ?= "debian-${BASE_DISTRO_CODENAME}"
++
++DISTRO_CONFIG_SCRIPT ?= "debian-configscript.sh"
++DISTRO_KERNELS ?= "4kc-malta 5kc-malta 686-pae 686 alpha-generic alpha-smp \
++	amd64 arm64 armmp-lpae armmp cloud-amd64 cloud-arm64 itanium \
++	loongson-3 m68k marvell mckinley mips32r6 mips32r6el mips64r6 \
++	mips64r6el octeon parisc parisc64 powerpc-smp powerpc powerpc64 \
++	powerpc64le riscv64 rpi rt-686-pae rt-amd64 rt-arm64 rt-armmp \
++	riscv64 s390x sh7751r sh7785lcr sparc64-smp sparc64"
++
++DISTRO_GCC = "13"
+-- 
+2.34.1
+
