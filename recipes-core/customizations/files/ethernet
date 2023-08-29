@@ -1,0 +1,13 @@
+#
+# Copyright (c) Siemens AG, 2023
+#
+# Authors:
+#  Tobias Schaffner <tobias.schaffner@siemens.com>
+#
+# SPDX-License-Identifier: MIT
+
+allow-hotplug end0
+allow-hotplug eth0
+
+iface end0 inet dhcp
+iface eth0 inet dhcp
