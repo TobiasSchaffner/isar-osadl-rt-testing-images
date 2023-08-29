@@ -1,6 +1,9 @@
 #
 # Copyright (c) Siemens AG, 2023
 #
+# Authors:
+#  Tobias Schaffner <tobias.schaffner@siemens.com>
+#
 # SPDX-License-Identifier: MIT
 
 header:
@@ -24,18 +27,18 @@ repos:
       0002-meta-isar-starfive-visionfive2-Use-kernel-DTB.patch:
         path: isar-patches/0002-meta-isar-starfive-visionfive2-Use-kernel-DTB.patch
         repo: isar-osadl-rt-testing-images
-      # 0003-meta-isar-jh7110-u-boot-spl-tool-Rework.patch:
-      #   path: isar-patches/0003-meta-isar-jh7110-u-boot-spl-tool-Rework.patch
-      #   repo: isar-osadl-rt-testing-images
-      # 0004-meta-isar-starfive-visionfive2-Switch-to-upstream-U-.patch:
-      #   path: isar-patches/0004-meta-isar-starfive-visionfive2-Switch-to-upstream-U-.patch
-      #   repo: isar-osadl-rt-testing-images
-      # 0005-meta-isar-starfive-visionfive2-Drop-obsolete-recipes.patch:
-      #   path: isar-patches/0005-meta-isar-starfive-visionfive2-Drop-obsolete-recipes.patch
-      #   repo: isar-osadl-rt-testing-images
-      # 0006-visionfive2-Allow-to-overwrite-DTB_FILES.patch:
-      #   path: isar-patches/0006-visionfive2-Allow-to-overwrite-DTB_FILES.patch
-      #   repo: isar-osadl-rt-testing-images
+      0003-meta-isar-jh7110-u-boot-spl-tool-Rework.patch:
+        path: isar-patches/0003-meta-isar-jh7110-u-boot-spl-tool-Rework.patch
+        repo: isar-osadl-rt-testing-images
+      0004-meta-isar-starfive-visionfive2-Switch-to-upstream-U-.patch:
+        path: isar-patches/0004-meta-isar-starfive-visionfive2-Switch-to-upstream-U-.patch
+        repo: isar-osadl-rt-testing-images
+      0005-meta-isar-starfive-visionfive2-Drop-obsolete-recipes.patch:
+        path: isar-patches/0005-meta-isar-starfive-visionfive2-Drop-obsolete-recipes.patch
+        repo: isar-osadl-rt-testing-images
+      0006-visionfive2-Allow-to-overwrite-DTB_FILES.patch:
+        path: isar-patches/0006-visionfive2-Allow-to-overwrite-DTB_FILES.patch
+        repo: isar-osadl-rt-testing-images
       0007-startfive-visionfive2-Allow-kernel-commandline-tuning.patch:
         path: isar-patches/0007-startfive-visionfive2-Allow-kernel-commandline-tuning.patch
         repo: isar-osadl-rt-testing-images
@@ -53,5 +56,6 @@ repos:
       meta-isar:
 
 local_conf_header:
-  settings:
+  settings: |
     ISAR_CROSS_COMPILE="1"
+    PREFERRED_VERSION_linux-starfive = "5.15-visionfive2"

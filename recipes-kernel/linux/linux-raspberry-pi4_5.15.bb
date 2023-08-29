@@ -1,9 +1,14 @@
 #
 # Copyright (c) Siemens AG, 2023
 #
+# Authors:
+#  Tobias Schaffner <tobias.schaffner@siemens.com>
+#
 # SPDX-License-Identifier: MIT
 
 require recipes-kernel/linux/linux-custom.inc
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/files/5.15.0/:${THISDIR}/files/5.15.0/rt:${THISDIR}/files/5.15.0/osadl:"
 
 SRC_URI += "git://github.com/raspberrypi/linux.git;protocol=https;branch=tobsch/rpi-5.15.y;destsuffix=linux-rpi4-${PV}"
 

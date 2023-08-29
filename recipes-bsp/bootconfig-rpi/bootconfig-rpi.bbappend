@@ -1,3 +1,11 @@
+#
+# Copyright (c) Siemens AG, 2023
+#
+# Authors:
+#  Tobias Schaffner <tobias.schaffner@siemens.com>
+#
+# SPDX-License-Identifier: MIT
+
 FILESEXTRAPATHS:append := "${THISDIR}/files:"
 
 SRC_URI += "file://cmdline.txt.tmpl"

@@ -1,12 +1,19 @@
+#
+# Copyright (c) Siemens AG, 2023
+#
+# Authors:
+#  Tobias Schaffner <tobias.schaffner@siemens.com>
+#
+# SPDX-License-Identifier: MIT
+
 require recipes-core/images/isar-image-base.bb
+IMAGE_INSTALL += "customizations"
 
 # Common tooling
 IMAGE_PREINSTALL += "vim openssh-server"
 
-IMAGE_INSTALL += "customizations sshd-regen-keys"
-
 # Realtime tooling
-IMAGE_PREINSTALL += "rt-tests"
+IMAGE_PREINSTALL += "rt-tests jitterdebugger stress-ng"
 
 # OSADL test image requirements
 IMAGE_PREINSTALL += "\
