@@ -5,7 +5,5 @@ This isar layer allows to build debian based preempt_rt evaluation images for th
 ## Build
 
 ```
-wget https://raw.githubusercontent.com/siemens/kas/master/kas-container
-chmod +x kas-container
 ./kas-container build <board_name>.yml
 ```
