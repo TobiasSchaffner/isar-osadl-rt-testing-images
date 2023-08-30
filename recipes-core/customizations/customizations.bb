@@ -19,8 +19,7 @@ DEBIAN_DEPENDS = "ifupdown, \
                   isc-dhcp-client, \
                   net-tools, \
                   iputils-ping, \
-                  ssh, \
-                  sshd-regen-keys"
+                  ssh"
 
 do_install() {
 	install -v -d ${D}/etc/network/interfaces.d
