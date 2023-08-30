@@ -11,16 +11,6 @@ header:
 machine: raspberry-pi4
 distro: raspios-bullseye
 
-repos:
-  isar-osadl-rt-testing-images:
-
-  isar:
-    url: https://github.com/ilbers/isar.git
-    refspec: ecc7cae423a828d294575301c1584fbe303cba3e
-    layers:
-      meta:
-      meta-isar:
-
 local_conf_header:
   settings:
     ISAR_CROSS_COMPILE="1"

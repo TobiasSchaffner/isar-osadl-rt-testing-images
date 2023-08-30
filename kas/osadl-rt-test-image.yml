@@ -13,6 +13,16 @@ build_system: isar
 
 target: osadl-rt-test-image
 
+repos:
+  isar-osadl-rt-testing-images:
+
+  isar:
+    url: https://github.com/ilbers/isar.git
+    commit: ecc7cae423a828d294575301c1584fbe303cba3e
+    layers:
+      meta:
+      meta-isar:
+      
 local_conf_header:
   kernel: |
     IMAGE_KERNEL_CMDLINE_TUNE = "isolcpus=2-3 rcu_nocbs=2-3 nohz_full=2-3 irqaffinity=0-1 tsc=nowatchdog nosoftlockup"

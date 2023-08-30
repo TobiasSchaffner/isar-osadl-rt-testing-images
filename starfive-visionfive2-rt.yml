@@ -15,11 +15,7 @@ machine: starfive-visionfive2
 distro: debian-sid-ports
 
 repos:
-  isar-osadl-rt-testing-images:
-
   isar:
-    url: https://github.com/ilbers/isar.git
-    refspec: ecc7cae423a828d294575301c1584fbe303cba3e
     patches:
       0001-meta-isar-u-boot-starfive-visionfive2-Fix-fetching-u.patch:
         path: isar-patches/0001-meta-isar-u-boot-starfive-visionfive2-Fix-fetching-u.patch
@@ -51,9 +47,6 @@ repos:
       0010-Allow-to-use-old-snapshots.patch:
         path: isar-patches/0010-Allow-to-use-old-snapshots.patch
         repo: isar-osadl-rt-testing-images
-    layers:
-      meta:
-      meta-isar:
 
 local_conf_header:
   settings: |
