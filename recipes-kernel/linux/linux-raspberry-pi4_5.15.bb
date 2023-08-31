@@ -10,10 +10,10 @@ require recipes-kernel/linux/linux-custom.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/5.15.0/:${THISDIR}/files/5.15.0/rt:${THISDIR}/files/5.15.0/osadl:"
 
-SRC_URI += "git://github.com/raspberrypi/linux.git;protocol=https;branch=tobsch/rpi-5.15.y;destsuffix=linux-rpi4-${PV}"
+SRC_URI += "git://github.com/raspberrypi/linux.git;protocol=https;branch=rpi-5.15.y;destsuffix=linux-rpi4-${PV}"
 
 # Enable preempt_rt by applying rt patches and enabling the rt switches in the kernel config
-SRC_URI += "file://patch-5.15-rt17.patch \
+SRC_URI += "file://patch-5.15.125-rt66.patch \
             file://preempt-rt.cfg"
 
 # Add the OSADL add on patches

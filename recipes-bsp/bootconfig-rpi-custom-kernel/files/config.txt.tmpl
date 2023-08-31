@@ -1,0 +1,7 @@
+arm_64bit=1
+enable_uart=1
+upstream_kernel=1
+dtoverlay=pi3-disable-bt
+
+kernel=${KERNEL_FILE}-${KERNEL_VERSION}+
+initramfs initrd.img-${KERNEL_VERSION}+

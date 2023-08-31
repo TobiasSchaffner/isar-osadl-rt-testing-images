@@ -18,13 +18,13 @@ repos:
 
   isar:
     url: https://github.com/ilbers/isar.git
-    commit: ecc7cae423a828d294575301c1584fbe303cba3e
+    refspec: ecc7cae423a828d294575301c1584fbe303cba3e
     layers:
       meta:
       meta-isar:
-      
+
 local_conf_header:
-  kernel: |
+  tuning: |
     IMAGE_KERNEL_CMDLINE_TUNE = "isolcpus=2-3 rcu_nocbs=2-3 nohz_full=2-3 irqaffinity=0-1 tsc=nowatchdog nosoftlockup"
   users: |
     USERS += "root"

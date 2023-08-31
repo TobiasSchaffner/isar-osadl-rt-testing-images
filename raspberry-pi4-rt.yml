@@ -14,3 +14,7 @@ distro: raspios-bullseye
 local_conf_header:
   settings:
     ISAR_CROSS_COMPILE="1"
+  kernel: |
+    KERNEL_NAME="raspberry-pi4"
+    # This has to be set for bootconfig-rpi-custom-kernel
+    KERNEL_VERSION = "5.15.92-rt66-isar"
