@@ -21,9 +21,16 @@ DEBIAN_DEPENDS = "ifupdown, \
                   iputils-ping, \
                   ssh"
 
+DEBIAN_DEPENDS:debian-sid-ports = "ifupdown, \
+                                   isc-dhcp-client, \
+                                   net-tools, \
+                                   iputils-ping, \
+                                   ssh, \
+                                   ntpsec"
+
 do_install() {
-	install -v -d ${D}/etc/network/interfaces.d
-	install -v -m 644 ${WORKDIR}/ethernet ${D}/etc/network/interfaces.d/
+    install -v -d ${D}/etc/network/interfaces.d
+    install -v -m 644 ${WORKDIR}/ethernet ${D}/etc/network/interfaces.d/
 
     install -v -d ${D}/etc/ssh/sshd_config.d/
     install -v -m 644 ${WORKDIR}/80-sshd-root-login.conf ${D}/etc/ssh/sshd_config.d/

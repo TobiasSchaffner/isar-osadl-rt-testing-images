@@ -7,7 +7,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-set -e
+set -ex
 
 echo "osadl-rt-test-image" > /etc/hostname
 echo "osadl preempt_rt evaluation image (login: root/root)" > /etc/issue
@@ -15,3 +15,9 @@ echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 
 # isc-dhcp-server
 systemctl enable dhclient.service
+
+# ntpsec is started with high priority in newer debian versions
+# this can lead to high latencies on unisolated cores.
+if [ -w "/etc/default/ntpsec" ]; then
+   sed -i 's|NTPD_OPTS="-g -N"|NTPD_OPTS="-g"|g' /etc/default/ntpsec
+fi
