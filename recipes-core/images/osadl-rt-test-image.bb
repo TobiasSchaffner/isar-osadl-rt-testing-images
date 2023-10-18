@@ -19,6 +19,9 @@ IMAGE_PREINSTALL += "rt-tests jitterdebugger stress-ng"
 IMAGE_PREINSTALL += "\
     bc \
     bison \
+    dbus \
+    dbus-session-bus-common \
+    dbus-system-bus-common \
     flex \
     gcc \
     gpm \
