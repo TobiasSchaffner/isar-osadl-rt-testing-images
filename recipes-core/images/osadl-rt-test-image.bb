@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: MIT
 
 require recipes-core/images/isar-image-base.bb
-IMAGE_INSTALL += "customizations sshd-regen-keys"
+IMAGE_INSTALL += "customizations sshd-regen-keys expand-on-first-boot"
 
 # Common tooling
 IMAGE_PREINSTALL += "vim openssh-server"
