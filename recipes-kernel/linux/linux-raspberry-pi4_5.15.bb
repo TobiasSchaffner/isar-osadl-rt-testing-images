@@ -21,7 +21,8 @@ SRC_URI += "file://add-nmi-callback-and-raw-parport-driver.patch \
             file://latency-histograms.patch \
             file://net-ipv4-icmp-ping-sysrq.patch \
             file://save-current-patchset-in-kernel.patch \
-            file://sched-add-per-cpu-load-measurement.patch"
+            file://sched-add-per-cpu-load-measurement.patch \
+            file://osadl.cfg"
 
 SRCREV = "14b35093ca68bf2c81bbc90aace5007142b40b40"
 
