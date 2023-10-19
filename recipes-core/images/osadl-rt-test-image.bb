@@ -31,6 +31,7 @@ IMAGE_PREINSTALL += "\
     libnet-dns-perl \
     libnuma-dev \
     libssl-dev \
+    liblocale-codes-perl \
     make \
     munin-node \
     munin-node \
