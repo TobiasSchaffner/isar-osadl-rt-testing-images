@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-starfive-visionfive2:
+  build-starfive-visionfive2-5.15:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +17,7 @@ jobs:
 
       - name: Build the starfive-visionfive2 image with kas-container
         run: |
-          ./kas-container --isar build starfive-visionfive2-rt.yml
+          ./kas-container --isar build starfive-visionfive2-5.15-rt.yml
 
       - name: Archive the starfive-visionfive2-rt .wic image
         uses: actions/upload-artifact@v3
@@ -26,14 +26,46 @@ jobs:
           path: |
             build/tmp/deploy/images/starfive-visionfive2/*.wic
 
-  build-raspberry-pi4:
+  build-raspberry-pi4-5.15:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Build the raspberry-pi4 image with kas-container
-        run: ./kas-container --isar build raspberry-pi4-rt.yml
+        run: ./kas-container --isar build raspberry-pi4-5.15-rt.yml
+
+      - name: Archive the raspberry-pi4-rt .wic image
+        uses: actions/upload-artifact@v3
+        with:
+          name: raspberry-pi4-rt-image
+          path: build/tmp/deploy/images/raspberry-pi4/*.wic
+
+  build-starfive-visionfive2-6.6:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build the starfive-visionfive2 image with kas-container
+        run: |
+          ./kas-container --isar build starfive-visionfive2-6.6-rt.yml
+
+      - name: Archive the starfive-visionfive2-rt .wic image
+        uses: actions/upload-artifact@v3
+        with:
+          name: starfive-visionfive2-rt-image
+          path: |
+            build/tmp/deploy/images/starfive-visionfive2/*.wic
+
+  build-raspberry-pi4-6.6:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build the raspberry-pi4 image with kas-container
+        run: ./kas-container --isar build raspberry-pi4-6.6-rt.yml
 
       - name: Archive the raspberry-pi4-rt .wic image
         uses: actions/upload-artifact@v3
