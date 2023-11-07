@@ -24,5 +24,3 @@ repos:
 local_conf_header:
   kernel: |
     PREFERRED_VERSION_linux-starfive = "5.15-visionfive2"
-  dtb: |
-    DTB_FILES = "starfive/jh7110-starfive-visionfive-2-v1.3b.dtb"
