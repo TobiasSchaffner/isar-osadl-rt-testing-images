@@ -1,0 +1,28 @@
+#
+# Copyright (c) Siemens AG, 2023
+#
+# Authors:
+#  Tobias Schaffner <tobias.schaffner@siemens.com>
+#
+# SPDX-License-Identifier: MIT
+
+header:
+  version: 10
+  includes:
+    - kas/osadl-rt-test-image.yml
+
+machine: starfive-visionfive2
+distro: debian-sid
+
+repos:
+  isar:
+    patches:
+      0001-visionfive2-allow-to-overwrite-DTB-path:
+        path: isar-patches/0001-visionfive2-allow-to-overwrite-DTB-path.patch
+        repo: isar-osadl-rt-testing-images
+
+local_conf_header:
+  kernel: |
+    PREFERRED_VERSION_linux-starfive = "6.6-visionfive2"
+  dtb: |
+    DTB_FILES = "starfive/jh7110-starfive-visionfive-2-v1.3b.dtb"

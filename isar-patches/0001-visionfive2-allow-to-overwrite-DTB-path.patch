@@ -1,0 +1,23 @@
+From 3dd2a836e8db75c895ca0bd90ab192ee0d70be84 Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Mon, 6 Nov 2023 13:26:30 +0100
+Subject: [PATCH] visionfive2: allow to overwrite DTB path
+
+Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
+---
+ meta-isar/conf/machine/starfive-visionfive2.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meta-isar/conf/machine/starfive-visionfive2.conf b/meta-isar/conf/machine/starfive-visionfive2.conf
+index 7393b1aa..e449bfe0 100644
+--- a/meta-isar/conf/machine/starfive-visionfive2.conf
++++ b/meta-isar/conf/machine/starfive-visionfive2.conf
+@@ -21,4 +21,4 @@ IMAGER_BUILD_DEPS += " \
+ # DTB file for OpenSBI
+ DTB_UBOOT_JH7110_VF2 = "starfive_visionfive2.dtb"
+ # DTB file for booting
+-DTB_FILES = "starfive/jh7110-visionfive-v2.dtb"
++DTB_FILES ?= "starfive/jh7110-visionfive-v2.dtb"
+-- 
+2.34.1
+

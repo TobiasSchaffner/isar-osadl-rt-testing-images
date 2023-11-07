@@ -1,0 +1,19 @@
+#
+# Copyright (c) Siemens AG, 2023
+#
+# SPDX-License-Identifier: MIT
+
+header:
+  version: 10
+  includes:
+    - kas/osadl-rt-test-image.yml
+
+machine: raspberry-pi4
+distro: raspios-bullseye
+
+local_conf_header:
+  kernel: |
+    KERNEL_NAME="raspberry-pi4"
+    PREFERRED_VERSION_linux-raspberry-pi4 = "6.6"
+    # This has to be set for bootconfig-rpi-custom-kernel
+    KERNEL_VERSION = "6.6.0-rc6-rt10-isar"

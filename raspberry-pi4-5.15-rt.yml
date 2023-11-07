@@ -16,5 +16,6 @@ local_conf_header:
     ISAR_CROSS_COMPILE="1"
   kernel: |
     KERNEL_NAME="raspberry-pi4"
+    PREFERRED_VERSION_linux-raspberry-pi4 = "5.15"
     # This has to be set for bootconfig-rpi-custom-kernel
     KERNEL_VERSION = "5.15.92-rt66-isar"
