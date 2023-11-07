@@ -1,0 +1,6 @@
+header:
+  version: 10
+
+local_conf_header:
+  dtb: |
+    DTB_FILES = "starfive/jh7110-starfive-visionfive-2-v1.2a.dtb"

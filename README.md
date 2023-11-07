@@ -7,3 +7,5 @@ This isar layer allows to build debian based preempt_rt evaluation images for th
 ```
 ./kas-container build <board_name>.yml
 ```
+
+Use the opt-starfive-visionfive2-1.2a.yml file to build for the older board revision.
