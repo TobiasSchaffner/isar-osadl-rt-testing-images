@@ -9,66 +9,82 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-starfive-visionfive2-5_15:
+  starfive-visionfive2-1_3b-kernel-5_15-rt:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build the starfive-visionfive2 image with kernel 5.15
+      - name: Build the starfive-visionfive2 image with kernel 5.15-rt
         run: |
           ./kas-container --isar build starfive-visionfive2-5.15-rt.yml
 
       - name: Archive the starfive-visionfive2-rt .wic image
         uses: actions/upload-artifact@v3
         with:
-          name: starfive-visionfive2-rt-image
+          name: starfive-visionfive2-v1_3b-kernel-5_15-rt
           path: |
             build/tmp/deploy/images/starfive-visionfive2/*.wic
 
-  build-raspberry-pi4-5_15:
+  raspberry-pi4-kernel-5_15-rt:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build the raspberry-pi4 image with kernel 5.15
+      - name: Build the raspberry-pi4 image with kernel 5.15-rt
         run: ./kas-container --isar build raspberry-pi4-5.15-rt.yml
 
       - name: Archive the raspberry-pi4-rt .wic image
         uses: actions/upload-artifact@v3
         with:
-          name: raspberry-pi4-rt-image
+          name: raspberry-pi4-kernel-5_15-rt
           path: build/tmp/deploy/images/raspberry-pi4/*.wic
 
-  build-starfive-visionfive2-6_6:
+  starfive-visionfive2-1_2a-kernel-6_6-rt:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build the starfive-visionfive2 image with kernel 6.6
+      - name: Build the starfive-visionfive2 1.2a image with kernel 6.6-rt
+        run: |
+          ./kas-container --isar build starfive-visionfive2-6.6-rt.yml:opt-startfive-visionfive2-1.2a.yml
+      - name: Archive the starfive-visionfive2-rt .wic image
+        uses: actions/upload-artifact@v3
+        with:
+          name: starfive-visionfive2-1_2a-kernel-6_6-rt
+          path: |
+            build/tmp/deploy/images/starfive-visionfive2/*.wic
+
+  starfive-visionfive2-1_3b-kernel-6_6-rt:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build the starfive-visionfive2 1.3b image with kernel 6.6-rt
         run: |
           ./kas-container --isar build starfive-visionfive2-6.6-rt.yml
 
       - name: Archive the starfive-visionfive2-rt .wic image
         uses: actions/upload-artifact@v3
         with:
-          name: starfive-visionfive2-rt-image
+          name: starfive-visionfive2-1_3b-kernel-6_6-rt
           path: |
             build/tmp/deploy/images/starfive-visionfive2/*.wic
 
-  build-raspberry-pi4-6_6:
+  raspberry-pi4-kernel-6_6-rt:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build the raspberry-pi4 image with kernel 6.6
+      - name: Build the raspberry-pi4 image with kernel 6.6-rt
         run: ./kas-container --isar build raspberry-pi4-6.6-rt.yml
 
       - name: Archive the raspberry-pi4-rt .wic image
         uses: actions/upload-artifact@v3
         with:
-          name: raspberry-pi4-rt-image
+          name: raspberry-pi4-kernel-6_6-rt
           path: build/tmp/deploy/images/raspberry-pi4/*.wic
