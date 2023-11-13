@@ -1,6 +1,6 @@
-From 325c5c971d7161fe636ac5ef8f3bda0a359f5bac Mon Sep 17 00:00:00 2001
+From 08f0195e527c024b803a15b1715ee38a8b27d2f2 Mon Sep 17 00:00:00 2001
 From: Tobias Schaffner <tobias.schaffner@siemens.com>
-Date: Wed, 29 Mar 2023 14:49:23 +0200
+Date: Mon, 13 Nov 2023 15:46:39 +0100
 Subject: [PATCH] startfive-visionfive2: Allow kernel commandline tuning
 
 The bitbake variable IMAGE_KERNEL_CMDLINE_TUNE can be used to pass
@@ -12,7 +12,7 @@ Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in b/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in
-index 0f3d76a..c127325 100644
+index 0f3d76a9..c127325b 100644
 --- a/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in
 +++ b/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in
 @@ -20,4 +20,4 @@ part /boot --source bootimg-efi-isar --sourceparams "loader=systemd-boot" --use-
