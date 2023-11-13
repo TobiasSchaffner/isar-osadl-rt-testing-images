@@ -12,14 +12,11 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/6.6.0/:${THISDIR}/
 
 # Enable preempt_rt by applying rt patches and enabling the rt switches in the kernel config
 SRC_URI += "git://github.com/torvalds/linux.git;protocol=https;branch=master;destsuffix=linux-visionfive-${PV} \
-            file://patch-6.6-rc6-rt10.patch \
+            file://patch-6.6-rt14.patch \
             file://starfive_visionfive2_defconfig \
             file://preempt-rt.cfg"
 
 SRCREV = "58720809f52779dc0f08e53e54b014209d13eebb"
-
-# Enable preempt_rt. lazy support for riscv is obsolete
-SRC_URI += "file://riscv-Allow-to-enable-RT.patch"
 
 # Add the OSADL add on patches
 SRC_URI += "file://add-nmi-callback-and-raw-parport-driver.patch \

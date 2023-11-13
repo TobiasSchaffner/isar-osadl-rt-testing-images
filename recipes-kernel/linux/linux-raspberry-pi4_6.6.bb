@@ -12,7 +12,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/6.6.0/:${THISDIR}/
 
 # Enable preempt_rt by applying rt patches and enabling the rt switches in the kernel config
 SRC_URI += "git://github.com/torvalds/linux.git;protocol=https;branch=master;destsuffix=linux-visionfive-${PV} \
-            file://patch-6.6-rc6-rt10.patch \
+            file://patch-6.6-rt14.patch \
             file://bcm2711_defconfig \
             file://preempt-rt.cfg"
 
