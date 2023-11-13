@@ -12,6 +12,8 @@ machine: raspberry-pi4
 distro: raspios-bullseye
 
 local_conf_header:
+  config: |
+    ISAR_CROSS_COMPILE = "1"
   kernel: |
     KERNEL_NAME="raspberry-pi4"
     PREFERRED_VERSION_linux-raspberry-pi4 = "6.6"
