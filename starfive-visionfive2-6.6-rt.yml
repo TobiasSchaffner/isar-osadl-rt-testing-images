@@ -20,12 +20,13 @@ repos:
       0001-visionfive2-allow-to-overwrite-DTB-path:
         path: isar-patches/0001-visionfive2-allow-to-overwrite-DTB-path.patch
         repo: isar-osadl-rt-testing-images
-      0001-startfive-visionfive2-Allow-kernel-commandline-tuning:
-        path: isar-patches/0001-startfive-visionfive2-Allow-kernel-commandline-tunin.patch
+      0001-starfive-visionfive2-Allow-kernel-commandline-tuning:
+        path: isar-patches/0001-starfive-visionfive2-Allow-kernel-commandline-tuning.patch
         repo: isar-osadl-rt-testing-images
 
 local_conf_header:
   kernel: |
     PREFERRED_VERSION_linux-starfive = "6.6-visionfive2"
   dtb: |
+    STARFIVE_VISIONFIVE2_DTB = "jh7110-starfive-visionfive-2-v1.3b.dtb"
     DTB_FILES = "starfive/jh7110-starfive-visionfive-2-v1.3b.dtb"

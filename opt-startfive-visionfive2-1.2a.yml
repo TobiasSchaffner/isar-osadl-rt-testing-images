@@ -3,4 +3,5 @@ header:
 
 local_conf_header:
   dtb: |
+    STARFIVE_VISIONFIVE2_DTB = "jh7110-starfive-visionfive-2-v1.2a.dtb"
     DTB_FILES = "starfive/jh7110-starfive-visionfive-2-v1.2a.dtb"

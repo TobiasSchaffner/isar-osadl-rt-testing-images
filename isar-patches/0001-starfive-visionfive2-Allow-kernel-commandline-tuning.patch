@@ -15,7 +15,7 @@ diff --git a/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in b/
 index 0f3d76a9..c127325b 100644
 --- a/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in
 +++ b/meta-isar/scripts/lib/wic/canned-wks/starfive-visionfive2.wks.in
-@@ -20,4 +20,4 @@ part /boot --source bootimg-efi-isar --sourceparams "loader=systemd-boot" --use-
+@@ -20,4 +20,4 @@ part /boot --source bootimg-efi-isar --sourceparams "loader=systemd-boot,dtb=${STARFIVE_VISIONFIVE2_DTB}" --use-
  # rootfs
  part / --source rootfs --use-uuid --fstype ext4 --mkfs-extraopts "-T default" --label image --active --align 1024 --exclude-path=boot/
  

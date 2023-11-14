@@ -18,4 +18,4 @@ local_conf_header:
     KERNEL_NAME="raspberry-pi4"
     PREFERRED_VERSION_linux-raspberry-pi4 = "6.6"
     # This has to be set for bootconfig-rpi-custom-kernel
-    KERNEL_VERSION = "6.6.0-rc6-rt10-isar"
+    KERNEL_VERSION = "6.6.0-rc6-rt14-isar"
