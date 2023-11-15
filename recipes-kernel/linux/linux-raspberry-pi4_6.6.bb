@@ -11,7 +11,7 @@ require recipes-kernel/linux/linux-custom.inc
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/6.6.0/:${THISDIR}/files/6.6.0/rt:${THISDIR}/files/6.6.0/osadl:"
 
 # Enable preempt_rt by applying rt patches and enabling the rt switches in the kernel config
-SRC_URI += "git://github.com/torvalds/linux.git;protocol=https;branch=master;destsuffix=linux-visionfive-${PV} \
+SRC_URI += "git://github.com/torvalds/linux.git;protocol=https;branch=master;destsuffix=linux-rpi4-${PV} \
             file://patch-6.6-rt14.patch \
             file://bcm2711_defconfig \
             file://preempt-rt.cfg"
@@ -26,7 +26,7 @@ SRC_URI += "file://add-nmi-callback-and-raw-parport-driver.patch \
             file://sched-add-per-cpu-load-measurement.patch \
             file://osadl.cfg"
 
-S = "${WORKDIR}/linux-visionfive-${PV}"
+S = "${WORKDIR}/linux-rpi4-${PV}"
 
 KERNEL_DEFCONFIG = "bcm2711_defconfig"
 
