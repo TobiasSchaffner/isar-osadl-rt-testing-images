@@ -1,5 +1,5 @@
 #
-# Copyright (c) Siemens AG, 2023
+# Copyright (c) Siemens AG, 2025
 #
 # Authors:
 #  Tobias Schaffner <tobias.schaffner@siemens.com>
@@ -11,9 +11,6 @@ IMAGE_INSTALL += "customizations sshd-regen-keys expand-on-first-boot"
 
 # Common tooling
 IMAGE_PREINSTALL += "vim openssh-server"
-
-# Realtime tooling
-IMAGE_PREINSTALL += "rt-tests jitterdebugger stress-ng"
 
 # OSADL test image requirements
 IMAGE_PREINSTALL += "\
@@ -37,7 +34,7 @@ IMAGE_PREINSTALL += "\
     munin-node \
     nasm \
     netpbm \
-    ntp \
+    openntpd \
     rsync \
     rsyslog \
     snmp"

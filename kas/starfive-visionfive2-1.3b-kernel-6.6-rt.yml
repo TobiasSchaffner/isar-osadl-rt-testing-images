@@ -9,24 +9,16 @@
 header:
   version: 10
   includes:
-    - kas/osadl-rt-test-image.yml
+    - kas/osadl-rt-test-image.inc
 
 machine: starfive-visionfive2
 distro: debian-sid
-
-repos:
-  isar:
-    patches:
-      0001-visionfive2-allow-to-overwrite-DTB-path:
-        path: isar-patches/0001-visionfive2-allow-to-overwrite-DTB-path.patch
-        repo: isar-osadl-rt-testing-images
-      0001-starfive-visionfive2-Allow-kernel-commandline-tuning:
-        path: isar-patches/0001-starfive-visionfive2-Allow-kernel-commandline-tuning.patch
-        repo: isar-osadl-rt-testing-images
+target: osadl-rt-test-image-preempt-rt
 
 local_conf_header:
   kernel: |
     PREFERRED_VERSION_linux-starfive = "6.6-visionfive2"
   dtb: |
-    STARFIVE_VISIONFIVE2_DTB = "jh7110-starfive-visionfive-2-v1.3b.dtb"
+    DTB_VISIONFIVE2 = "jh7110-starfive-visionfive-2-v1.3b.dtb"
     DTB_FILES = "starfive/jh7110-starfive-visionfive-2-v1.3b.dtb"
+    WICVARS += "DTB_VISIONFIVE2"

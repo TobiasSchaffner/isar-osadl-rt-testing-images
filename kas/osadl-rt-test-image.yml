@@ -11,19 +11,25 @@ header:
 
 build_system: isar
 
-target: osadl-rt-test-image
-
 repos:
   isar-osadl-rt-testing-images:
 
   isar:
     url: https://github.com/ilbers/isar.git
-    commit: 6144daf9814e7e8c612c2cefe9595fd42bd6d5bc
+    commit: 9792d18e9334b3cec72e2ade6a1065084c0c24d6
     layers:
       meta:
       meta-isar:
+    patches:
+      0001-starfive-visionfive2-Allow-kernel-commandline-tuning:
+        path: isar-patches/0001-starfive-visionfive2-Allow-kernel-commandline-tuning.patch
+        repo: isar-osadl-rt-testing-images
 
 local_conf_header:
+  cross: |
+    ISAR_CROSS_COMPILE = "1"
+  ccache: |
+    USE_CCACHE = "1"
   tuning: |
     IMAGE_KERNEL_CMDLINE_TUNE = "isolcpus=2-3 rcu_nocbs=2-3 nohz_full=2-3 irqaffinity=0-1 tsc=nowatchdog nosoftlockup"
   users: |

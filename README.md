@@ -26,10 +26,8 @@ Run kas-container to build the desired image:
 
 
 Supported targets:
- * raspberry-pi4-kernel-5.15-rt
  * raspberry-pi4-kernel-6.6-rt
  * starfive-visionfive2-1.2a-kernel-6.6-rt
- * starfive-visionfive2-1.3b-kernel-5.15-rt
  * starfive-visionfive2-1.3b-kernel-6.6-rt
 
 
