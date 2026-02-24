@@ -1,0 +1,26 @@
+#!/usr/bin/make -f
+
+INSTALL_DIR = debian/unix-bench/opt/unix-bench
+
+override_dh_auto_build:
+	$(MAKE) -C UnixBench GRAPHIC_TESTS="" \
+		CC=$(DEB_HOST_GNU_TYPE)-gcc \
+		OPTON="-O3 -ffast-math"
+
+override_dh_auto_install:
+	mkdir -p $(INSTALL_DIR)
+	cp -a UnixBench/pgms $(INSTALL_DIR)/
+	cp -a UnixBench/testdir $(INSTALL_DIR)/
+	cp -a UnixBench/tmp $(INSTALL_DIR)/ 2>/dev/null || mkdir -p $(INSTALL_DIR)/tmp
+	cp -a UnixBench/results $(INSTALL_DIR)/ 2>/dev/null || mkdir -p $(INSTALL_DIR)/results
+	cp UnixBench/Run $(INSTALL_DIR)/
+	cp UnixBench/Makefile $(INSTALL_DIR)/
+	chmod +x $(INSTALL_DIR)/Run
+
+override_dh_auto_test:
+
+override_dh_strip:
+	dh_strip || true
+
+%:
+	dh $@

@@ -9,6 +9,8 @@
 require recipes-core/images/isar-image-base.bb
 IMAGE_INSTALL += "customizations sshd-regen-keys expand-on-first-boot"
 
+IMAGE_INSTALL += "unix-bench"
+
 # Common tooling
 IMAGE_PREINSTALL += "vim openssh-server"
 

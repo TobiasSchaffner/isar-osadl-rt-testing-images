@@ -1,0 +1,14 @@
+Source: ${PN}
+Section: misc
+Priority: optional
+Standards-Version: 3.9.6
+Maintainer: OSADL <info@osadl.org>
+Build-Depends: ${DEBIAN_BUILD_DEPENDS}
+
+Package: unix-bench
+Architecture: ${DISTRO_ARCH}
+Description: ${DESCRIPTION}
+ UnixBench is the original BYTE UNIX benchmark suite, updated and revised
+ by many people over the years. It provides a basic indicator of the
+ performance of a Unix-like system.
+Depends: ${shlibs:Depends}, ${misc:Depends}
