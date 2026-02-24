@@ -27,6 +27,10 @@ repos:
   xenomai-images:
     url: https://gitlab.com/Xenomai/xenomai-images.git
     commit: 392ab5561833b35bf2336acb5f9f8e854034813c
+    patches:
+      0001-Use-personal-linux-repository.patch:
+        path: xenomai-images-patches/0001-Use-personal-linux-repository.patch
+        repo: isar-osadl-rt-testing-images
 
 local_conf_header:
   cross: |

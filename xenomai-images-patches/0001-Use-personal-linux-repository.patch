@@ -1,0 +1,24 @@
+From e9651446deca36ae447c752785230536d8dc8600 Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Tue, 24 Feb 2026 19:03:19 +0100
+Subject: [PATCH] Use personal linux repository
+
+Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
+---
+ recipes-kernel/linux/linux-xenomai-4_latest.bb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/recipes-kernel/linux/linux-xenomai-4_latest.bb b/recipes-kernel/linux/linux-xenomai-4_latest.bb
+index 20fa03f..4a2d6d0 100644
+--- a/recipes-kernel/linux/linux-xenomai-4_latest.bb
++++ b/recipes-kernel/linux/linux-xenomai-4_latest.bb
+@@ -36,5 +36,5 @@ GIT_BRANCH = "${@ \
+     else d.getVar('LATEST_KERNEL_BRANCH') }"
+ GIT_BRANCH:riscv64 = "wip/evl-riscv"
+ 
+-SRC_URI += "git://gitlab.com/Xenomai/xenomai4/linux-evl.git;protocol=https;branch=${GIT_BRANCH}"
++SRC_URI += "git://github.com/TobiasSchaffner/linux.git;protocol=https;branch=wip/evl-riscv"
+ SRCREV = "${AUTOREV}"
+-- 
+2.43.0
+
