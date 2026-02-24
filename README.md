@@ -28,10 +28,8 @@ Run kas-container to build the desired image:
 Supported targets:
  * raspberry-pi4-preemptrt
  * raspberry-pi4-evl
- * starfive-visionfive2-1.2a-preemptrt
- * starfive-visionfive2-1.2a-evl
- * starfive-visionfive2-1.3b-preemptrt
- * starfive-visionfive2-1.3b-evl
+ * starfive-visionfive2-preemptrt
+ * starfive-visionfive2-evl
 
 Optional overlays:
  * opt-debug - Enable EVL/kernel debug options

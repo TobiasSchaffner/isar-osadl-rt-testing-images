@@ -12,18 +12,15 @@ header:
     - kas/osadl-rt-test-image.yml
 
 machine: starfive-visionfive2
-target: osadl-rt-test-image-preempt-rt
+target: osadl-rt-test-image-evl
 distro: osadl-rt-test-xenomai
 
 local_conf_header:
   hostname: |
-    MACHINE_HOSTNAME = "osadl-rt-test-starfive-visionfive2-1.2a-preemptrt"
+    MACHINE_HOSTNAME = "osadl-rt-test-starfive-visionfive2-evl"
   wks: |
     WKS_FILE_NAME = "starfive-visionfive2.wks.in"
   kernel: |
-    KERNEL_NAME="starfive-visionfive2"
-    PREFERRED_VERSION_linux-starfive-visionfive2 = "7.0"
+    KERNEL_NAME = "xenomai-4"
   dtb: |
-    DTB_VISIONFIVE2 = "jh7110-starfive-visionfive-2-v1.2a.dtb"
-    DTB_FILES = "starfive/jh7110-starfive-visionfive-2-v1.2a.dtb"
-    WICVARS += "DTB_VISIONFIVE2"
+    DTB_FILES = "starfive/jh7110-starfive-visionfive-2-v1.2a.dtb starfive/jh7110-starfive-visionfive-2-v1.3b.dtb"

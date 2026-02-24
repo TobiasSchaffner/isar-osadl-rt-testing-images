@@ -9,7 +9,6 @@
 
 set -ex
 
-echo "osadl-rt-test-image" > /etc/hostname
 echo "osadl preempt_rt evaluation image (login: root/root)" > /etc/issue
 echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 
