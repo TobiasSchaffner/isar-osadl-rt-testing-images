@@ -1,5 +1,5 @@
 #
-# Copyright (c) Siemens AG, 2023
+# Copyright (c) Siemens AG, 2023-2026
 #
 # Authors:
 #  Tobias Schaffner <tobias.schaffner@siemens.com>
@@ -12,13 +12,15 @@ header:
     - kas/osadl-rt-test-image.yml
 
 machine: starfive-visionfive2
-distro: debian-sid
 target: osadl-rt-test-image-preempt-rt
+distro: osadl-rt-test-xenomai
 
 local_conf_header:
+  wks:
+    WKS_FILE_NAME = "starfive-visionfive2.wks.in"
   kernel: |
     PREFERRED_VERSION_linux-starfive = "6.6-visionfive2"
   dtb: |
-    WICVARS += "DTB_VISIONFIVE2"
     DTB_VISIONFIVE2 = "jh7110-starfive-visionfive-2-v1.2a.dtb"
     DTB_FILES = "starfive/jh7110-starfive-visionfive-2-v1.2a.dtb"
+    WICVARS += "DTB_VISIONFIVE2"

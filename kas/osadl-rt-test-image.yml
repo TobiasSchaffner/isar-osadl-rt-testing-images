@@ -21,9 +21,12 @@ repos:
       meta:
       meta-isar:
     patches:
-      0001-starfive-visionfive2-Allow-kernel-commandline-tuning:
+      0001-starfive-visionfive2-Allow-kernel-commandline-tuning.patch:
         path: isar-patches/0001-starfive-visionfive2-Allow-kernel-commandline-tuning.patch
         repo: isar-osadl-rt-testing-images
+  xenomai-images:
+    url: https://gitlab.com/Xenomai/xenomai-images.git
+    commit: 392ab5561833b35bf2336acb5f9f8e854034813c
 
 local_conf_header:
   cross: |

@@ -1,0 +1,14 @@
+#
+# Copyright (c) Siemens AG, 2026
+#
+# SPDX-License-Identifier: MIT
+#
+# Enable Xenomai/EVL debug options
+# Include this file in your kas configuration to enable debug features
+
+header:
+  version: 10
+
+local_conf_header:
+  xenomai-debug: |
+    XENOMAI_DEBUG = "1"

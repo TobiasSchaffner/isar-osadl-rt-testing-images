@@ -41,15 +41,15 @@ Signed-off-by: Carsten Emde <C.Emde@osadl.org>
  init/Kconfig                   |   28 +++++
  kernel/sched/Makefile          |    2 
  kernel/sched/core.c            |   31 +++++
- kernel/sched/cpu_idleruntime.c |  226 +++++++++++++++++++++++++++++++++++++++++
+ kernel/sched/cpu_idleruntime.c |  227 +++++++++++++++++++++++++++++++++++++++++
  kernel/sched/sched.h           |    8 +
- 5 files changed, 295 insertions(+)
+ 5 files changed, 296 insertions(+)
 
-Index: linux-6.5-rc4-rt1/init/Kconfig
+Index: linux-6.18.2/init/Kconfig
 ===================================================================
---- linux-6.5-rc4-rt1.orig/init/Kconfig
-+++ linux-6.5-rc4-rt1/init/Kconfig
-@@ -583,6 +583,34 @@ config BSD_PROCESS_ACCT_V3
+--- linux-6.18.2.orig/init/Kconfig
++++ linux-6.18.2/init/Kconfig
+@@ -642,6 +642,34 @@ config BSD_PROCESS_ACCT_V3
  	  for processing it. A preliminary version of these tools is available
  	  at <http://www.gnu.org/software/acct/>.
  
@@ -84,23 +84,14 @@ Index: linux-6.5-rc4-rt1/init/Kconfig
  config TASKSTATS
  	bool "Export task/process statistics through netlink"
  	depends on NET
-Index: linux-6.5-rc4-rt1/kernel/sched/Makefile
+
+Index: linux-6.18.2/kernel/sched/core.c
 ===================================================================
---- linux-6.5-rc4-rt1.orig/kernel/sched/Makefile
-+++ linux-6.5-rc4-rt1/kernel/sched/Makefile
-@@ -32,3 +32,5 @@ obj-y += core.o
- obj-y += fair.o
- obj-y += build_policy.o
- obj-y += build_utility.o
-+obj-y += cpu_idleruntime.o
-+
-Index: linux-6.5-rc4-rt1/kernel/sched/core.c
-===================================================================
---- linux-6.5-rc4-rt1.orig/kernel/sched/core.c
-+++ linux-6.5-rc4-rt1/kernel/sched/core.c
-@@ -5231,6 +5231,37 @@ prepare_task_switch(struct rq *rq, struc
- 	kmap_local_sched_out();
- 	prepare_task(next);
+--- linux-6.18.2.orig/kernel/sched/core.c
++++ linux-6.18.2/kernel/sched/core.c
+@@ -5139,6 +5139,37 @@ prepare_task_switch(struct rq *rq, struct task_struct *prev,
+ 	 */
+ 	hard_cond_local_irq_disable();
  	prepare_arch_switch(next);
 +#ifdef CONFIG_CPU_IDLERUNTIME
 +	if (is_idle_task(next)) {
@@ -136,11 +127,12 @@ Index: linux-6.5-rc4-rt1/kernel/sched/core.c
  }
  
  /**
-Index: linux-6.5-rc4-rt1/kernel/sched/cpu_idleruntime.c
+
+Index: linux-6.18.2/kernel/sched/cpu_idleruntime.c
 ===================================================================
 --- /dev/null
-+++ linux-6.5-rc4-rt1/kernel/sched/cpu_idleruntime.c
-@@ -0,0 +1,226 @@
++++ linux-6.18.2/kernel/sched/cpu_idleruntime.c
+@@ -0,0 +1,227 @@
 +/*
 +   cpu_idleruntime.c: provide CPU usage data based on idle processing
 +
@@ -166,6 +158,7 @@ Index: linux-6.5-rc4-rt1/kernel/sched/cpu_idleruntime.c
 +#include <linux/cpu.h>
 +#include <linux/sched/clock.h>
 +#include <linux/sched/cputime.h>
++#include <linux/mmu_context.h>
 +#include "sched.h"
 +
 +DEFINE_PER_CPU(unsigned long long, idlestart);
@@ -367,11 +360,23 @@ Index: linux-6.5-rc4-rt1/kernel/sched/cpu_idleruntime.c
 +}
 +
 +early_initcall(idleruntime_init);
-Index: linux-6.5-rc4-rt1/kernel/sched/sched.h
+
+Index: linux-6.18.2/kernel/sched/Makefile
 ===================================================================
---- linux-6.5-rc4-rt1.orig/kernel/sched/sched.h
-+++ linux-6.5-rc4-rt1/kernel/sched/sched.h
-@@ -1712,6 +1712,14 @@ this_rq_lock_irq(struct rq_flags *rf)
+--- linux-6.18.2.orig/kernel/sched/Makefile
++++ linux-6.18.2/kernel/sched/Makefile
+@@ -37,3 +37,5 @@ obj-y += core.o
+ obj-y += fair.o
+ obj-y += build_policy.o
+ obj-y += build_utility.o
++obj-y += cpu_idleruntime.o
++
+
+Index: linux-6.18.2/kernel/sched/sched.h
+===================================================================
+--- linux-6.18.2.orig/kernel/sched/sched.h
++++ linux-6.18.2/kernel/sched/sched.h
+@@ -1920,6 +1920,14 @@ static inline struct rq *this_rq_lock_irq(struct rq_flags *rf)
  	return rq;
  }
  
@@ -384,5 +389,5 @@ Index: linux-6.5-rc4-rt1/kernel/sched/sched.h
 +#endif
 +
  #ifdef CONFIG_NUMA
+ 
  enum numa_topology_type {
- 	NUMA_DIRECT,

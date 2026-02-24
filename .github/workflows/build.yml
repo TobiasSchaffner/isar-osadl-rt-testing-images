@@ -9,50 +9,92 @@ on:
   workflow_dispatch:
 
 jobs:
-  raspberry-pi4-kernel-6_6-rt:
+  raspberry-pi4-preemptrt:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Build the raspberry-pi4 image with kernel 6.6-rt
-        run: ./kas-container --isar build kas/raspberry-pi4-kernel-6.6-rt.yml
+      - name: Build the Raspberry Pi 4 PREEMPT_RT image
+        run: ./kas-container --isar build kas/raspberry-pi4-preemptrt.yml
 
-      - name: Archive the raspberry-pi4-rt .wic image
-        uses: actions/upload-artifact@v3
+      - name: Archive the .wic image
+        uses: actions/upload-artifact@v4
         with:
-          name: raspberry-pi4-kernel-6.6-rt
-          path: build/tmp/deploy/images/raspberry-pi4/*.wic
+          name: raspberry-pi4-preemptrt
+          path: build/tmp/deploy/images/rpi-arm64-v8/*.wic
 
-  starfive-visionfive2-1_2a-kernel-6_6-rt:
+  raspberry-pi4-evl:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Build the starfive-visionfive2 1.2a image with kernel 6.6-rt
-        run: |
-          ./kas-container --isar build kas/starfive-visionfive2-1.2a-kernel-6.6-rt.yml
-      - name: Archive the starfive-visionfive2-rt .wic image
-        uses: actions/upload-artifact@v3
+      - name: Build the Raspberry Pi 4 EVL image
+        run: ./kas-container --isar build kas/raspberry-pi4-evl.yml
+
+      - name: Archive the .wic image
+        uses: actions/upload-artifact@v4
         with:
-          name: starfive-visionfive2-1.2a-kernel-6.6-rt
-          path: |
-            build/tmp/deploy/images/starfive-visionfive2/*.wic
+          name: raspberry-pi4-evl
+          path: build/tmp/deploy/images/rpi4/*.wic
 
-  starfive-visionfive2-1_3b-kernel-6_6-rt:
+  starfive-visionfive2-1_2a-preemptrt:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Build the starfive-visionfive2 1.3b image with kernel 6.6-rt
-        run: |
-          ./kas-container --isar build kas/starfive-visionfive2-1.3b-kernel-6.6-rt.yml
+      - name: Build the StarFive VisionFive2 1.2a PREEMPT_RT image
+        run: ./kas-container --isar build kas/starfive-visionfive2-1.2a-preemptrt.yml
 
-      - name: Archive the starfive-visionfive2-rt .wic image
-        uses: actions/upload-artifact@v3
+      - name: Archive the .wic image
+        uses: actions/upload-artifact@v4
         with:
-          name: starfive-visionfive2-1.3b-kernel-6.6-rt
-          path: |
-            build/tmp/deploy/images/starfive-visionfive2/*.wic
+          name: starfive-visionfive2-1.2a-preemptrt
+          path: build/tmp/deploy/images/starfive-visionfive2/*.wic
+
+  starfive-visionfive2-1_2a-evl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the StarFive VisionFive2 1.2a EVL image
+        run: ./kas-container --isar build kas/starfive-visionfive2-1.2a-evl.yml
+
+      - name: Archive the .wic image
+        uses: actions/upload-artifact@v4
+        with:
+          name: starfive-visionfive2-1.2a-evl
+          path: build/tmp/deploy/images/starfive-visionfive2/*.wic
+
+  starfive-visionfive2-1_3b-preemptrt:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the StarFive VisionFive2 1.3b PREEMPT_RT image
+        run: ./kas-container --isar build kas/starfive-visionfive2-1.3b-preemptrt.yml
+
+      - name: Archive the .wic image
+        uses: actions/upload-artifact@v4
+        with:
+          name: starfive-visionfive2-1.3b-preemptrt
+          path: build/tmp/deploy/images/starfive-visionfive2/*.wic
+
+  starfive-visionfive2-1_3b-evl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the StarFive VisionFive2 1.3b EVL image
+        run: ./kas-container --isar build kas/starfive-visionfive2-1.3b-evl.yml
+
+      - name: Archive the .wic image
+        uses: actions/upload-artifact@v4
+        with:
+          name: starfive-visionfive2-1.3b-evl
+          path: build/tmp/deploy/images/starfive-visionfive2/*.wic

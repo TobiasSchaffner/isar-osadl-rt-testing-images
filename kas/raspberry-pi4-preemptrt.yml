@@ -1,9 +1,6 @@
 #
 # Copyright (c) Siemens AG, 2023-2026
 #
-# Authors:
-#  Tobias Schaffner <tobias.schaffner@siemens.com>
-#
 # SPDX-License-Identifier: MIT
 
 header:
@@ -12,11 +9,12 @@ header:
     - kas/osadl-rt-test-image.yml
 
 machine: rpi4
-target: osadl-rt-test-image-evl
-distro: osadl-rt-test-xenomai
+distro: debian-trixie
+target: osadl-rt-test-image-preempt-rt
 
 local_conf_header:
   wks:
     WKS_FILE_NAME = "rpi4.wks"
-  arch: |
-    COMPAT_DISTRO_ARCH = "armhf"
+  kernel: |
+    KERNEL_NAME="raspberry-pi4"
+    PREFERRED_VERSION_linux-raspberry-pi4 = "6.18"

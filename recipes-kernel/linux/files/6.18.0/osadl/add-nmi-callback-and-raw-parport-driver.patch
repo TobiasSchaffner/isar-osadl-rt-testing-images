@@ -22,17 +22,17 @@ Signed-off-by: Carsten Emde <C.Emde@osadl.org>
  include/linux/interrupt.h     |    2 
  kernel/irq/handle.c           |    4 
  kernel/irq/manage.c           |    7 
- kernel/sched/core.c           |    1 
+ kernel/sched/syscalls.c       |    1 
  kernel/trace/trace_syscalls.c |    3 
  11 files changed, 559 insertions(+)
 
-Index: linux-6.5-rc7/drivers/misc/Kconfig
+Index: linux-6.18.2/drivers/misc/Kconfig
 ===================================================================
---- linux-6.5-rc7.orig/drivers/misc/Kconfig
-+++ linux-6.5-rc7/drivers/misc/Kconfig
-@@ -561,6 +561,72 @@ config TPS6594_PFSM
- 	  This driver can also be built as a module.  If so, the module
- 	  will be called tps6594-pfsm.
+--- linux-6.18.2.orig/drivers/misc/Kconfig
++++ linux-6.18.2/drivers/misc/Kconfig
+@@ -644,6 +644,72 @@ config MCHP_LAN966X_PCI
+ 	    - lan966x-miim (MDIO_MSCC_MIIM)
+ 	    - lan966x-switch (LAN966X_SWITCH)
  
 +config SETPARPORT_RAW
 +	tristate "Raw output driver for parallel port"
@@ -103,22 +103,24 @@ Index: linux-6.5-rc7/drivers/misc/Kconfig
  source "drivers/misc/c2port/Kconfig"
  source "drivers/misc/eeprom/Kconfig"
  source "drivers/misc/cb710/Kconfig"
-Index: linux-6.5-rc7/drivers/misc/Makefile
+
+Index: linux-6.18.2/drivers/misc/Makefile
 ===================================================================
---- linux-6.5-rc7.orig/drivers/misc/Makefile
-+++ linux-6.5-rc7/drivers/misc/Makefile
-@@ -37,6 +37,7 @@ obj-$(CONFIG_C2PORT)		+= c2port/
+--- linux-6.18.2.orig/drivers/misc/Makefile
++++ linux-6.18.2/drivers/misc/Makefile
+@@ -39,6 +39,7 @@ obj-$(CONFIG_C2PORT)		+= c2port/
  obj-$(CONFIG_HMC6352)		+= hmc6352.o
  obj-y				+= eeprom/
  obj-y				+= cb710/
 +obj-$(CONFIG_SETPARPORT_RAW)	+= setparport.o
  obj-$(CONFIG_VMWARE_BALLOON)	+= vmw_balloon.o
  obj-$(CONFIG_PCH_PHUB)		+= pch_phub.o
- obj-y				+= ti-st/
-Index: linux-6.5-rc7/drivers/misc/setparport.c
+ obj-y				+= lis3lv02d/
+
+Index: linux-6.18.2/drivers/misc/setparport.c
 ===================================================================
 --- /dev/null
-+++ linux-6.5-rc7/drivers/misc/setparport.c
++++ linux-6.18.2/drivers/misc/setparport.c
 @@ -0,0 +1,468 @@
 +/*
 + * setparport - set bits of the parallel port by writing immediately
@@ -280,7 +282,7 @@ Index: linux-6.5-rc7/drivers/misc/setparport.c
 +
 +static const struct file_operations setparport_fops = {
 +	.owner		= THIS_MODULE,
-+	.llseek		= no_llseek,
++	.llseek		= noop_llseek,
 +	.open		= setparport_open,
 +	.read		= setparport_read,
 +	.write		= setparport_write,
@@ -588,22 +590,24 @@ Index: linux-6.5-rc7/drivers/misc/setparport.c
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Carsten Emde <C.Emde@osadl.org>");
 +MODULE_DESCRIPTION("Install NMI call and set/get parallel port w/o device IRQ");
-Index: linux-6.5-rc7/fs/super.c
+
+Index: linux-6.18.2/fs/super.c
 ===================================================================
---- linux-6.5-rc7.orig/fs/super.c
-+++ linux-6.5-rc7/fs/super.c
-@@ -1058,6 +1058,7 @@ void emergency_thaw_all(void)
- 		schedule_work(work);
+--- linux-6.18.2.orig/fs/super.c
++++ linux-6.18.2/fs/super.c
+@@ -1180,6 +1180,7 @@ static inline bool get_active_super(struct super_block *sb)
  	}
+ 	return active;
  }
 +EXPORT_SYMBOL(emergency_remount);
  
- static DEFINE_IDA(unnamed_dev_ida);
+ static const char *filesystems_freeze_ptr = "filesystems_freeze";
  
-Index: linux-6.5-rc7/fs/sync.c
+
+Index: linux-6.18.2/fs/sync.c
 ===================================================================
---- linux-6.5-rc7.orig/fs/sync.c
-+++ linux-6.5-rc7/fs/sync.c
+--- linux-6.18.2.orig/fs/sync.c
++++ linux-6.18.2/fs/sync.c
 @@ -142,6 +142,8 @@ void emergency_sync(void)
  		schedule_work(work);
  	}
@@ -613,11 +617,12 @@ Index: linux-6.5-rc7/fs/sync.c
  
  /*
   * sync a single super
-Index: linux-6.5-rc7/include/linux/hardirq.h
+
+Index: linux-6.18.2/include/linux/hardirq.h
 ===================================================================
---- linux-6.5-rc7.orig/include/linux/hardirq.h
-+++ linux-6.5-rc7/include/linux/hardirq.h
-@@ -101,6 +101,8 @@ void irq_exit_rcu(void);
+--- linux-6.18.2.orig/include/linux/hardirq.h
++++ linux-6.18.2/include/linux/hardirq.h
+@@ -102,6 +102,8 @@ void irq_exit_rcu(void);
   * be marked 'notrace' and call nmi_enter() as soon as possible.
   */
  
@@ -626,7 +631,7 @@ Index: linux-6.5-rc7/include/linux/hardirq.h
  /*
   * nmi_enter() can nest up to 15 times; see NMI_BITS.
   */
-@@ -110,6 +112,8 @@ void irq_exit_rcu(void);
+@@ -111,6 +113,8 @@ void irq_exit_rcu(void);
  		arch_nmi_enter();				\
  		BUG_ON(in_nmi() == NMI_MASK);			\
  		__preempt_count_add(NMI_OFFSET + HARDIRQ_OFFSET);	\
@@ -635,21 +640,23 @@ Index: linux-6.5-rc7/include/linux/hardirq.h
  	} while (0)
  
  #define nmi_enter()						\
-Index: linux-6.5-rc7/include/linux/interrupt.h
+
+Index: linux-6.18.2/include/linux/interrupt.h
 ===================================================================
---- linux-6.5-rc7.orig/include/linux/interrupt.h
-+++ linux-6.5-rc7/include/linux/interrupt.h
-@@ -860,4 +860,6 @@ extern int arch_early_irq_init(void);
+--- linux-6.18.2.orig/include/linux/interrupt.h
++++ linux-6.18.2/include/linux/interrupt.h
+@@ -908,4 +908,6 @@ extern int arch_early_irq_init(void);
  
  #define __softirq_entry  __section(".softirqentry.text")
  
 +void set_nmicallback(void (*new_nmicallback)(void));
 +
  #endif
-Index: linux-6.5-rc7/kernel/irq/handle.c
+
+Index: linux-6.18.2/kernel/irq/handle.c
 ===================================================================
---- linux-6.5-rc7.orig/kernel/irq/handle.c
-+++ linux-6.5-rc7/kernel/irq/handle.c
+--- linux-6.18.2.orig/kernel/irq/handle.c
++++ linux-6.18.2/kernel/irq/handle.c
 @@ -17,6 +17,10 @@
  #include <asm/irq_regs.h>
  
@@ -661,13 +668,14 @@ Index: linux-6.5-rc7/kernel/irq/handle.c
  
  #include "internals.h"
  
-Index: linux-6.5-rc7/kernel/irq/manage.c
+
+Index: linux-6.18.2/kernel/irq/manage.c
 ===================================================================
---- linux-6.5-rc7.orig/kernel/irq/manage.c
-+++ linux-6.5-rc7/kernel/irq/manage.c
-@@ -2850,6 +2850,13 @@ int irq_get_irqchip_state(unsigned int i
+--- linux-6.18.2.orig/kernel/irq/manage.c
++++ linux-6.18.2/kernel/irq/manage.c
+@@ -2797,6 +2797,13 @@ bool irq_has_action(unsigned int irq)
  }
- EXPORT_SYMBOL_GPL(irq_get_irqchip_state);
+ EXPORT_SYMBOL_GPL(irq_has_action);
  
 +void (*nmicallback)(void);
 +void set_nmicallback(void (*new_nmicallback)(void))
@@ -677,13 +685,14 @@ Index: linux-6.5-rc7/kernel/irq/manage.c
 +EXPORT_SYMBOL_GPL(set_nmicallback);
 +
  /**
-  *	irq_set_irqchip_state - set the state of a forwarded interrupt.
-  *	@irq: Interrupt line that is forwarded to a VM
-Index: linux-6.5-rc7/kernel/sched/core.c
+  * irq_check_status_bit - Check whether bits in the irq descriptor status are set
+  * @irq:	The linux irq number
+
+Index: linux-6.18.2/kernel/sched/syscalls.c
 ===================================================================
---- linux-6.5-rc7.orig/kernel/sched/core.c
-+++ linux-6.5-rc7/kernel/sched/core.c
-@@ -8656,6 +8656,7 @@ static void do_sched_yield(void)
+--- linux-6.18.2.orig/kernel/sched/syscalls.c
++++ linux-6.18.2/kernel/sched/syscalls.c
+@@ -1359,6 +1359,7 @@ static void do_sched_yield(void)
  
  	schedule();
  }
@@ -691,10 +700,11 @@ Index: linux-6.5-rc7/kernel/sched/core.c
  
  /**
   * sys_sched_yield - yield the current processor to other threads.
-Index: linux-6.5-rc7/kernel/trace/trace_syscalls.c
+
+Index: linux-6.18.2/kernel/trace/trace_syscalls.c
 ===================================================================
---- linux-6.5-rc7.orig/kernel/trace/trace_syscalls.c
-+++ linux-6.5-rc7/kernel/trace/trace_syscalls.c
+--- linux-6.18.2.orig/kernel/trace/trace_syscalls.c
++++ linux-6.18.2/kernel/trace/trace_syscalls.c
 @@ -13,6 +13,9 @@
  #include "trace_output.h"
  #include "trace.h"
