@@ -16,7 +16,7 @@ target: osadl-rt-test-image-preempt-rt
 distro: osadl-rt-test-xenomai
 
 local_conf_header:
-  wks:
+  wks: |
     WKS_FILE_NAME = "starfive-visionfive2.wks.in"
   kernel: |
     PREFERRED_VERSION_linux-starfive = "6.6-visionfive2"

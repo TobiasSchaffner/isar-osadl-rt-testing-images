@@ -12,3 +12,4 @@ IMAGE_PREINSTALL += "stress-ng"
 
 # Realtime tooling
 IMAGE_INSTALL += "libevl-test"
+IMAGE_INSTALL += "cyclictest-latmus"

@@ -13,8 +13,8 @@ distro: debian-trixie
 target: osadl-rt-test-image-preempt-rt
 
 local_conf_header:
-  wks:
-    WKS_FILE_NAME = "rpi4.wks"
+  wks: |
+    WKS_FILE = "rpi4.wks"
   kernel: |
     KERNEL_NAME="raspberry-pi4"
     PREFERRED_VERSION_linux-raspberry-pi4 = "6.18"

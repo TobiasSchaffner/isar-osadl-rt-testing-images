@@ -1,0 +1,297 @@
+#!/usr/bin/env python3
+#
+# cyclictest-latmus: A wrapper providing cyclictest-compatible interface
+# using latmus (EVL/Xenomai 4) as the measurement backend.
+#
+# Copyright (c) Siemens AG, 2026
+#
+# Authors:
+#  Tobias Schaffner <tobias.schaffner@siemens.com>
+#
+# SPDX-License-Identifier: MIT
+
+import argparse
+import os
+import re
+import signal
+import subprocess
+import sys
+import tempfile
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        prog='cyclictest',
+        description='cyclictest-compatible wrapper for latmus (EVL)',
+        add_help=False,
+    )
+
+    parser.add_argument('-l', '--loops', type=int, default=0,
+                        help='Number of loops (0 = infinite)')
+    parser.add_argument('-m', '--mlockall', action='store_true',
+                        help='Lock memory (always on with latmus)')
+    parser.add_argument('-n', '--nanosleep', action='store_true',
+                        help='Use clock_nanosleep (ignored, latmus uses EVL timers)')
+    parser.add_argument('-a', '--affinity', nargs='?', const='0', default=None,
+                        help='CPU affinity')
+    parser.add_argument('-t', '--threads', nargs='?', type=int, const=1, default=1,
+                        help='Number of threads (latmus only supports 1)')
+    parser.add_argument('-p', '--priority', type=int, default=80,
+                        help='RT priority')
+    parser.add_argument('-S', '--smp', action='store_true',
+                        help='SMP testing: one thread per CPU (latmus uses 1 thread)')
+    parser.add_argument('-i', '--interval', type=int, default=1000,
+                        help='Base interval in us')
+    parser.add_argument('-h', '--histogram', type=int, default=0,
+                        help='Histogram size in us')
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        help='Only print summary at end')
+    parser.add_argument('-D', '--duration', default=None,
+                        help='Duration (e.g. 5m, 1h, 30s)')
+    parser.add_argument('-d', '--distance', type=int, default=0,
+                        help='Distance between threads (ignored)')
+    parser.add_argument('--help', action='help')
+
+    return parser.parse_args()
+
+
+def loops_to_timeout(loops, interval_us):
+    """Convert loop count + interval to a timeout string for latmus -T."""
+    total_secs = (loops * interval_us) / 1_000_000
+    if total_secs < 1:
+        return '1s'
+    return f'{int(total_secs)}s'
+
+
+def build_latmus_cmd(args, plot_file):
+    """Build latmus command line from parsed cyclictest arguments.
+
+    Latmus CLI reference:
+        -m --measure               measure latency on timer event [default]
+        -t --tune                  tune the EVL core timer
+        -i --irq                   measure/tune interrupt latency
+        -k --kernel                measure/tune kernel scheduling latency
+        -u --user                  measure/tune user scheduling latency
+            [ if none of --irq, --kernel or --user is given,
+            tune for all contexts ]
+        -s --sirq                  measure in-band response time to synthetic irq
+        -p --period=<us>           sampling period
+        -P --priority=<prio>       responder thread priority [=90]
+        -c --cpu=<n>               pin responder thread to CPU [=current]
+        -C --force-cpu=<n>         similar to -c, accept non-isolated CPU
+        -r --reset                 reset core timer gravity to factory default
+        -b --background            run in the background (daemon mode)
+        -K --keep-going            keep going on unexpected switch to in-band mode
+        -A --max-abort=<us>        abort if maximum latency exceeds threshold
+        -T --timeout=<t>[dhms]     stop measurement after <t> [d(ays)|h(ours)|m(inutes)|s(econds)]
+        -v --verbose[=level]       set verbosity level [=1]
+        -q --quiet                 quiet mode (i.e. --verbose=0)
+        -l --lines=<num>           result lines per page, 0 = no pagination [=21]
+        -H --histogram[=<nr>]      set histogram size to <nr> cells [=200]
+        -g --plot=<filename>       dump histogram data to file (gnuplot format)
+        -z --inband-gpio=<host>    measure in-band response time to GPIO event via <host|'broadcast'>
+        -Z --oob-gpio=<host>       measure EVL response time to GPIO event via <host|'broadcast'>
+        -I --gpio-in=<spec>        input GPIO line configuration
+            with <spec> = gpiochip-devname,pin-number[,rising-edge|falling-edge]
+        -O --gpio-out=<spec>       output GPIO line configuration
+            with <spec> = gpiochip-devname,pin-number
+        -E --net=<host>            measure out-of-band UDP delay talking to <host>
+            -L --local-if=<netif>   use specified local network interface
+            -n --no-check           disable packet sequence check
+            -S --packet-size=<n>    set the UDP packet size (> 20 bytes)
+    """
+    cmd = ['latmus', '-m']
+
+    cmd.extend(['-p', str(args.interval)])
+    cmd.extend(['-P', str(args.priority)])
+
+    if args.affinity is not None:
+        cpu = str(args.affinity).split('-')[0].split(',')[0]
+        cmd.extend(['-c', cpu])
+
+    if args.loops > 0:
+        cmd.extend(['-T', loops_to_timeout(args.loops, args.interval)])
+
+    if args.duration is not None:
+        # latmus -T accepts the same suffixes as cyclictest -D
+        cmd.extend(['-T', args.duration])
+
+    if args.histogram > 0:
+        cmd.append(f'-H{args.histogram}')
+        cmd.append(f'-g{plot_file}')
+
+    cmd.append('-q')
+
+    return cmd
+
+
+def parse_latmus_output(output):
+    """Parse latmus RTD line for min/avg/max/overrun/msw."""
+    lat_min = lat_avg = lat_max = 0.0
+    overrun = msw = 0
+
+    for line in output.splitlines():
+        if line.startswith('RTD|'):
+            parts = [p.strip() for p in line.split('|')]
+            if len(parts) >= 8:
+                lat_min = float(parts[1])
+                lat_avg = float(parts[2])
+                lat_max = float(parts[3])
+                overrun = int(parts[4])
+                msw = int(parts[5])
+
+    return lat_min, lat_avg, lat_max, overrun, msw
+
+
+def format_summary(args, lat_min, lat_avg, lat_max, loops):
+    """Format a cyclictest T: summary line."""
+    pid = os.getpid()
+    imin = max(0, int(round(lat_min)))
+    iavg = max(0, int(round(lat_avg)))
+    imax = max(0, int(round(lat_max)))
+
+    return (
+        f"T: 0 ({pid:5d}) P:{args.priority:2d} I:{args.interval:4d} "
+        f"C:{loops:10d} Min:{imin:7d} Act:{iavg:5d} Avg:{iavg:5d} Max:{imax:7d}"
+    )
+
+
+def read_histogram(plot_file, num_buckets):
+    """Read latmus gnuplot histogram file and format as cyclictest histogram.
+
+    latmus -g format: one line per bucket with "bucket_us count" pairs,
+    comment lines start with '#'.
+    """
+    buckets = {}
+    total = 0
+    overflow = 0
+
+    if not os.path.exists(plot_file):
+        return [], 0, 0
+
+    with open(plot_file, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith('#') or not line:
+                continue
+            parts = line.split()
+            if len(parts) >= 2:
+                bucket = int(float(parts[0]))
+                count = int(parts[1])
+                buckets[bucket] = count
+                total += count
+
+    lines = []
+    for i in range(num_buckets):
+        count = buckets.get(i, 0)
+        lines.append(f"{i:06d} {count:09d}")
+
+    for bucket, count in buckets.items():
+        if bucket >= num_buckets:
+            overflow += count
+
+    return lines, total, overflow
+
+
+def main():
+    args = parse_args()
+
+    if args.threads and args.threads > 1:
+        print(
+            f"# WARNING: latmus supports 1 thread, ignoring -t {args.threads}",
+            file=sys.stderr,
+        )
+
+    plot_file = None
+    if args.histogram > 0:
+        plot_file = tempfile.mktemp(suffix='.plot', prefix='latmus_')
+
+    try:
+        cmd = build_latmus_cmd(args, plot_file or '')
+
+        print(f"# Running: {' '.join(cmd)}", file=sys.stderr)
+
+        # Forward SIGINT to latmus so it prints final results
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        )
+
+        def forward_signal(signum, frame):
+            proc.send_signal(signum)
+
+        signal.signal(signal.SIGINT, forward_signal)
+        signal.signal(signal.SIGTERM, forward_signal)
+
+        stdout, stderr = proc.communicate()
+
+        if proc.returncode not in (0, -2, -signal.SIGINT):
+            # -2 / -SIGINT is normal for user-interrupted runs
+            print(f"latmus failed (exit {proc.returncode}): {stderr}",
+                  file=sys.stderr)
+            sys.exit(proc.returncode if proc.returncode > 0 else 1)
+
+        output = stdout + stderr
+        lat_min, lat_avg, lat_max, overrun, msw = parse_latmus_output(output)
+
+        loops = args.loops if args.loops > 0 else 0
+
+        print("# /dev/cpu_dma_latency set to 0us")
+
+        if args.histogram > 0 and plot_file:
+            if os.path.exists(plot_file):
+                with open(plot_file, 'r') as dbg:
+                    raw = dbg.read()
+                print(f"# Plot file ({len(raw)} bytes): {plot_file}",
+                      file=sys.stderr)
+                if raw:
+                    for dbg_line in raw.splitlines()[:5]:
+                        print(f"#   {dbg_line}", file=sys.stderr)
+                    if len(raw.splitlines()) > 5:
+                        print(f"#   ... ({len(raw.splitlines())} lines total)",
+                              file=sys.stderr)
+                else:
+                    print("#   (empty file)", file=sys.stderr)
+            else:
+                print(f"# Plot file NOT FOUND: {plot_file}", file=sys.stderr)
+
+            hist_lines, total, overflow = read_histogram(
+                plot_file, args.histogram
+            )
+
+            if loops == 0:
+                loops = total
+
+            print(format_summary(args, lat_min, lat_avg, lat_max, loops))
+            print("# Histogram")
+            for line in hist_lines:
+                print(line)
+            print(f"# Total: {total:09d}")
+            print(f"# Min Latencies: {int(round(lat_min)):05d}")
+            print(f"# Avg Latencies: {int(round(lat_avg)):05d}")
+            print(f"# Max Latencies: {int(round(lat_max)):05d}")
+            print(f"# Histogram Overflows: {overflow:05d}")
+            print(f"# Histogram Overflow at cycle number:")
+            print(f"# Thread 0:")
+        else:
+            if loops == 0:
+                loops = 1
+            print(format_summary(args, lat_min, lat_avg, lat_max, loops))
+
+        if overrun > 0:
+            print(
+                f"# WARNING: {overrun} timer overruns detected",
+                file=sys.stderr,
+            )
+        if msw > 0:
+            print(
+                f"# WARNING: {msw} mode switches detected",
+                file=sys.stderr,
+            )
+
+    finally:
+        if plot_file and os.path.exists(plot_file):
+            os.unlink(plot_file)
+
+
+if __name__ == '__main__':
+    main()

@@ -16,7 +16,7 @@ target: osadl-rt-test-image-evl
 distro: osadl-rt-test-xenomai
 
 local_conf_header:
-  wks:
+  wks: |
     WKS_FILE_NAME = "starfive-visionfive2.wks.in"
   dtb: |
     DTB_VISIONFIVE2 = "jh7110-starfive-visionfive-2-v1.2a.dtb"

@@ -16,7 +16,7 @@ target: osadl-rt-test-image-evl
 distro: osadl-rt-test-xenomai
 
 local_conf_header:
-  wks:
+  wks: |
     WKS_FILE_NAME = "rpi4.wks"
   arch: |
     COMPAT_DISTRO_ARCH = "armhf"
