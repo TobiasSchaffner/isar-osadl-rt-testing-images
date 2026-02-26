@@ -16,6 +16,8 @@ target: osadl-rt-test-image-preempt-rt
 distro: osadl-rt-test-xenomai
 
 local_conf_header:
+  hostname: |
+    MACHINE_HOSTNAME = "osadl-rt-test-starfive-visionfive2-1.3b-preemptrt"
   wks: |
     WKS_FILE_NAME = "starfive-visionfive2.wks.in"
   kernel: |

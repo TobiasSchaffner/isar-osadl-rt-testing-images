@@ -13,6 +13,8 @@ distro: debian-trixie
 target: osadl-rt-test-image-preempt-rt
 
 local_conf_header:
+  hostname: |
+    MACHINE_HOSTNAME = "osadl-rt-test-rpi4-preemptrt"
   wks: |
     WKS_FILE = "rpi4.wks"
   kernel: |

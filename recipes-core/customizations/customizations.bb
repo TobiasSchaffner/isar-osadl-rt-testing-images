@@ -37,4 +37,6 @@ do_install() {
 
     install -v -d ${D}/etc/systemd/system/
     install -v -m 644 ${WORKDIR}/dhclient.service ${D}/etc/systemd/system/
+
+    echo "${MACHINE_HOSTNAME}" > ${D}/etc/hostname
 }

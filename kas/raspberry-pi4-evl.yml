@@ -16,6 +16,8 @@ target: osadl-rt-test-image-evl
 distro: osadl-rt-test-xenomai
 
 local_conf_header:
+  hostname: |
+    MACHINE_HOSTNAME = "osadl-rt-test-rpi4-evl"
   wks: |
     WKS_FILE_NAME = "rpi4.wks"
   arch: |
