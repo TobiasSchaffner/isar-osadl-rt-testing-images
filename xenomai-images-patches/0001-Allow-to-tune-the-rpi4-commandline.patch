@@ -1,0 +1,41 @@
+From bc2d38657cd7ec2ab83b9da718d1075740446e65 Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Fri, 27 Feb 2026 11:27:58 +0100
+Subject: [PATCH] Allow to tune the rpi4 commandline
+
+Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
+---
+ .../files/debian/{cmdline.txt => cmdline.txt.tmpl}            | 2 +-
+ recipes-bsp/rpi-firmware/rpi-firmware_1.20230405.bb           | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+ rename recipes-bsp/rpi-firmware/files/debian/{cmdline.txt => cmdline.txt.tmpl} (64%)
+
+diff --git a/recipes-bsp/rpi-firmware/files/debian/cmdline.txt b/recipes-bsp/rpi-firmware/files/debian/cmdline.txt.tmpl
+similarity index 64%
+rename from recipes-bsp/rpi-firmware/files/debian/cmdline.txt
+rename to recipes-bsp/rpi-firmware/files/debian/cmdline.txt.tmpl
+index 58971c5..8a877c7 100644
+--- a/recipes-bsp/rpi-firmware/files/debian/cmdline.txt
++++ b/recipes-bsp/rpi-firmware/files/debian/cmdline.txt.tmpl
+@@ -1 +1 @@
+-module_blacklist=vc4 console=ttyS1,115200 root=/dev/mmcblk0p2 rootwait
++module_blacklist=vc4 console=ttyS1,115200 root=/dev/mmcblk0p2 rootwait ${IMAGE_KERNEL_CMDLINE_TUNE}
+diff --git a/recipes-bsp/rpi-firmware/rpi-firmware_1.20230405.bb b/recipes-bsp/rpi-firmware/rpi-firmware_1.20230405.bb
+index 1cfb103..ca86df0 100644
+--- a/recipes-bsp/rpi-firmware/rpi-firmware_1.20230405.bb
++++ b/recipes-bsp/rpi-firmware/rpi-firmware_1.20230405.bb
+@@ -22,7 +22,11 @@ S = "${WORKDIR}/firmware-${PV}"
+ 
+ DEBIAN_BUILD_DEPENDS = "device-tree-compiler"
+ 
++TEMPLATE_FILES = "debian/cmdline.txt.tmpl"
++TEMPLATE_VARS += "IMAGE_KERNEL_CMDLINE_TUNE"
++
+ do_prepare_build[cleandirs] += "${S}/debian"
++addtask do_prepare_build after do_transform_template
+ do_prepare_build() {
+     cp -r ${WORKDIR}/debian ${S}
+ 
+-- 
+2.43.0
+
