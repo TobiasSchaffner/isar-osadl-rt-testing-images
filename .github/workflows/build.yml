@@ -22,7 +22,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: raspberry-pi4-preemptrt
-          path: build/tmp/deploy/images/rpi-arm64-v8/*.wic
+          path: build/tmp/deploy/images/rpi4/*.wic
 
   raspberry-pi4-evl:
     runs-on: ubuntu-latest
