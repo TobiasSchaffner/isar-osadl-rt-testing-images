@@ -1,0 +1,26 @@
+From 3607f9398fd09f1968cf0b6c77b952fa91580847 Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Fri, 27 Feb 2026 09:41:19 +0100
+Subject: [PATCH] latmus: dump histogram data on ERESTARTSYS
+
+Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
+---
+ drivers/evl/latmus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/evl/latmus.c b/drivers/evl/latmus.c
+index f9b48c993a48..cdd1abf0887e 100644
+--- a/drivers/evl/latmus.c
++++ b/drivers/evl/latmus.c
+@@ -969,7 +969,7 @@ static int run_measurement(struct latmus_runner *runner,
+ 		return -EFAULT;
+ 
+ 	ret = measure_continously(runner);
+-	if (ret != -EINTR)
++	if (ret != -EINTR && ret != -ERESTARTSYS)
+ 		return ret;
+ 
+ 	/*
+-- 
+2.43.0
+
