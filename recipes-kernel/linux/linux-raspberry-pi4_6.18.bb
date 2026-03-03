@@ -12,13 +12,11 @@ require osadl-patches.inc
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += "git://github.com/raspberrypi/linux.git;protocol=https;branch=rpi-${PV}.y;destsuffix=linux-rpi4-${PV} \
-            file://bcm2711_defconfig \
-            file://preempt-rt.cfg"
+            file://preempt-rt.cfg \
+            file://realtime.cfg"
 
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/linux-rpi4-${PV}"
-
-KERNEL_DEFCONFIG = "bcm2711_defconfig"
 
 LINUX_VERSION_EXTENSION = "-isar"

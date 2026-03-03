@@ -10,4 +10,4 @@ require osadl-patches.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "file://0001-latmus-dump-histogram-data-on-ERESTARTSYS.patch \
-            file://evl_extra.cfg"
+            file://realtime.cfg"
