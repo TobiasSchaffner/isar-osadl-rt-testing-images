@@ -12,7 +12,7 @@ IMAGE_INSTALL += "customizations sshd-regen-keys expand-on-first-boot"
 IMAGE_INSTALL += "unix-bench"
 
 # Common tooling
-IMAGE_PREINSTALL += "vim openssh-server"
+IMAGE_PREINSTALL += "vim openssh-server htop"
 
 # OSADL test image requirements
 IMAGE_PREINSTALL += "\
@@ -32,7 +32,7 @@ IMAGE_PREINSTALL += "\
     libssl-dev \
     liblocale-codes-perl \
     make \
-    munin-node \
+    mtd-utils \
     munin-node \
     nasm \
     netpbm \

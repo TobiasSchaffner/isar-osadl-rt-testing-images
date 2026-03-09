@@ -1,15 +1,16 @@
-From e9651446deca36ae447c752785230536d8dc8600 Mon Sep 17 00:00:00 2001
-From: Tobias Schaffner <tobias.schaffner@siemens.com>
+From 478d574c40df46025de3c5fb7944ad227682d810 Mon Sep 17 00:00:00 2001
+From: kas <kas@example.com>
 Date: Tue, 24 Feb 2026 19:03:19 +0100
 Subject: [PATCH] Use personal linux repository
 
 Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
 ---
  recipes-kernel/linux/linux-xenomai-4_latest.bb | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ recipes-xenomai/libevl/libevl_master.bb        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/recipes-kernel/linux/linux-xenomai-4_latest.bb b/recipes-kernel/linux/linux-xenomai-4_latest.bb
-index 20fa03f..4a2d6d0 100644
+index 20fa03f..6feec02 100644
 --- a/recipes-kernel/linux/linux-xenomai-4_latest.bb
 +++ b/recipes-kernel/linux/linux-xenomai-4_latest.bb
 @@ -36,5 +36,5 @@ GIT_BRANCH = "${@ \
@@ -18,6 +19,19 @@ index 20fa03f..4a2d6d0 100644
  
 -SRC_URI += "git://gitlab.com/Xenomai/xenomai4/linux-evl.git;protocol=https;branch=${GIT_BRANCH}"
 +SRC_URI += "git://github.com/TobiasSchaffner/linux.git;protocol=https;branch=wip/evl-riscv"
+ SRCREV = "${AUTOREV}"
+diff --git a/recipes-xenomai/libevl/libevl_master.bb b/recipes-xenomai/libevl/libevl_master.bb
+index 48f10dc..ab840c1 100644
+--- a/recipes-xenomai/libevl/libevl_master.bb
++++ b/recipes-xenomai/libevl/libevl_master.bb
+@@ -14,7 +14,7 @@ require libevl.inc
+ GIT_BRANCH = "${PV}"
+ GIT_BRANCH:riscv64 = "wip/libevl-riscv"
+ 
+-SRC_URI += "git://gitlab.com/Xenomai/xenomai4/libevl.git;protocol=https;branch=${GIT_BRANCH}"
++SRC_URI += "git://github.com/TobiasSchaffner/libevl.git;protocol=https;branch=${GIT_BRANCH}"
+ 
+ CHANGELOG_V = "9999-${PV}"
  SRCREV = "${AUTOREV}"
 -- 
 2.43.0

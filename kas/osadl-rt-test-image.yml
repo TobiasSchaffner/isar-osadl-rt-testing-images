@@ -41,7 +41,7 @@ local_conf_header:
   ccache: |
     USE_CCACHE = "1"
   tuning: |
-    IMAGE_KERNEL_CMDLINE_TUNE = "isolcpus=2-3 rcu_nocbs=2-3 nohz_full=2-3 irqaffinity=0-1 tsc=nowatchdog nosoftlockup"
+    IMAGE_KERNEL_CMDLINE_TUNE = "isolcpus=2-3 rcu_nocbs=2-3 nohz_full=2-3 irqaffinity=0-1 tsc=nowatchdog nosoftlockup audit=0"
   users: |
     USERS += "root"
     # Development password: root
