@@ -1,0 +1,26 @@
+From dc0ff650cbed3843af5ceaa886ed2c17596553a4 Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Tue, 10 Mar 2026 09:05:20 +0100
+Subject: [PATCH] allow custom kernel
+
+Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
+---
+ conf/distro/xenomai-demo.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/conf/distro/xenomai-demo.conf b/conf/distro/xenomai-demo.conf
+index 1a58054..23b1e6b 100644
+--- a/conf/distro/xenomai-demo.conf
++++ b/conf/distro/xenomai-demo.conf
+@@ -23,7 +23,7 @@ include conf/distro/include/xenomai-version.inc
+ 
+ PREFERRED_VERSION_libevl ?= "5%"
+ 
+-KERNEL_NAME = "xenomai-${XENOMAI_MAJOR_VERSION}"
++KERNEL_NAME ?= "xenomai-${XENOMAI_MAJOR_VERSION}"
+ 
+ SDK_INSTALL += "linux-headers-${KERNEL_NAME}"
+ SDK_INSTALL += "${@'libevl' if d.getVar('XENOMAI_MAJOR_VERSION') == '4' else 'libxenomai-dev'}"
+-- 
+2.43.0
+

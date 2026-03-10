@@ -385,13 +385,15 @@ def main():
     threads = determine_thread_config(args)
     num_threads = len(threads)
 
-    # Create temp plot files for histogram mode
+    # Create temp plot file paths for histogram mode.
+    # Only generate names — do not create the files, because latmus
+    # refuses to overwrite an existing file via -g.
     plot_files = []
     if args.histogram > 0:
+        tmpdir = tempfile.gettempdir()
         for i in range(num_threads):
-            fd, path = tempfile.mkstemp(
-                suffix=f'_t{i}.plot', prefix='latmus_')
-            os.close(fd)
+            path = os.path.join(
+                tmpdir, f'latmus_{os.getpid()}_t{i}.plot')
             plot_files.append(path)
     else:
         plot_files = [None] * num_threads

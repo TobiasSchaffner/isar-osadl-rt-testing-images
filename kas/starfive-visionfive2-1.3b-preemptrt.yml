@@ -21,7 +21,7 @@ local_conf_header:
   wks: |
     WKS_FILE_NAME = "starfive-visionfive2.wks.in"
   kernel: |
-    KERNEL_NAME_OVERWRITE="starfive-visionfive2"
+    KERNEL_NAME = "starfive-visionfive2"
     PREFERRED_VERSION_linux-starfive-visionfive2 = "6.18"
   dtb: |
     DTB_VISIONFIVE2 = "jh7110-starfive-visionfive-2-v1.3b.dtb"
