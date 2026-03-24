@@ -7,7 +7,6 @@
 # SPDX-License-Identifier: MIT
 
 inherit linux-kernel
-require osadl-patches.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.0.0/osadl-preemptrt:"
 require osadl-patches.inc
