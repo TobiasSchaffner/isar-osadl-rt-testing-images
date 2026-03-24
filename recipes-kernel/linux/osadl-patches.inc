@@ -7,7 +7,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/6.18.0/osadl:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.0.0/osadl:"
 
 SRC_URI += "file://add-nmi-callback-and-raw-parport-driver.patch \
             file://latency-histograms.patch \

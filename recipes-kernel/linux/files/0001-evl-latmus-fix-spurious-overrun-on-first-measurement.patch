@@ -1,0 +1,38 @@
+From 0b1f6b3ed51905ffdfac067278a82c953afb4929 Mon Sep 17 00:00:00 2001
+From: Tobias Schaffner <tobias.schaffner@siemens.com>
+Date: Thu, 19 Mar 2026 09:31:43 +0100
+Subject: [PATCH] evl/latmus: fix spurious overrun on first measurement sample
+
+measure_continuously() starts the periodic timer before the responder
+thread has entered evl_wait_flag(&pulse). Since evl_flag is a binary
+latch, the first pulse fires with nobody waiting and is consumed
+instantly when the responder arrives, causing state->ideal to drift
+one period ahead of reality during warmup.
+
+Fix this by re-anchoring state->ideal to the actual timestamp on the
+last warmup sample, absorbing any accumulated startup drift.
+
+Signed-off-by: Tobias Schaffner <tobias.schaffner@siemens.com>
+---
+ drivers/evl/latmus.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/evl/latmus.c b/drivers/evl/latmus.c
+index cdd1abf0887e..70f8c0e77b08 100644
+--- a/drivers/evl/latmus.c
++++ b/drivers/evl/latmus.c
+@@ -169,7 +169,10 @@ static int add_measurement_sample(struct latmus_runner *runner,
+ 	/* Skip samples in warmup time. */
+ 	if (runner->warmup_samples < runner->warmup_limit) {
+ 		runner->warmup_samples++;
+-		state->ideal = ktime_add(state->ideal, period);
++		if (runner->warmup_samples == runner->warmup_limit)
++			state->ideal = ktime_add(timestamp, period);
++		else
++			state->ideal = ktime_add(state->ideal, period);
+ 		return 0;
+ 	}
+ 
+-- 
+2.43.0
+

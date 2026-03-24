@@ -19,4 +19,4 @@ local_conf_header:
     WKS_FILE = "rpi4.wks"
   kernel: |
     KERNEL_NAME="raspberry-pi4"
-    PREFERRED_VERSION_linux-raspberry-pi4 = "6.18"
+    PREFERRED_VERSION_linux-raspberry-pi4 = "7.0"

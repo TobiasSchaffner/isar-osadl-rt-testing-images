@@ -128,8 +128,19 @@ def parse_args():
 
 
 def get_online_cpus():
-    """Get sorted list of online CPU IDs available to this process."""
-    return sorted(os.sched_getaffinity(0))
+    """Get sorted list of all online CPU IDs from sysfs."""
+    try:
+        with open('/sys/devices/system/cpu/online') as f:
+            cpus = []
+            for part in f.read().strip().split(','):
+                if '-' in part:
+                    lo, hi = part.split('-', 1)
+                    cpus.extend(range(int(lo), int(hi) + 1))
+                else:
+                    cpus.append(int(part))
+            return sorted(cpus)
+    except (IOError, ValueError):
+        return sorted(os.sched_getaffinity(0))
 
 
 def parse_affinity(spec, online_cpus):
@@ -147,8 +158,7 @@ def parse_affinity(spec, online_cpus):
         else:
             cpus.append(int(part))
 
-    available = set(online_cpus)
-    return [c for c in cpus if c in available] or list(online_cpus)
+    return cpus or list(online_cpus)
 
 
 def determine_thread_config(args):
@@ -424,19 +434,116 @@ def main():
 
         # Collect output from all processes in parallel to avoid
         # pipe-buffer deadlocks when multiple instances run concurrently.
+        # When not quiet, parse RTD| lines from latmus stdout and redraw
+        # cyclictest-style T: summary lines in-place on the terminal.
         results = [None] * num_threads
+        live_stats_lock = threading.Lock()
+        live_stats = [None] * num_threads  # (min, avg, max, act, count)
+
+        def _parse_rtd(line):
+            """Parse 'RTD| min | avg | max | overruns | msw | best | worst'."""
+            if not line.startswith('RTD|'):
+                return None
+            parts = [p.strip() for p in line.split('|')]
+            if len(parts) < 8:
+                return None
+            try:
+                return (float(parts[6]),   # best (all-time min)
+                        float(parts[2]),   # avg (current bulk)
+                        float(parts[7]),   # worst (all-time max)
+                        float(parts[1]),   # current min as Act
+                        int(parts[4]))     # overruns as count proxy
+            except (ValueError, IndexError):
+                return None
 
         def _collect(idx, proc):
-            stdout, stderr = proc.communicate()
-            results[idx] = (proc.returncode, stdout, stderr)
+            stdout_lines = []
+            stderr_lines = []
+
+            def _read_stdout(stream, lines):
+                for line in stream:
+                    lines.append(line)
+                    parsed = _parse_rtd(line)
+                    if parsed:
+                        with live_stats_lock:
+                            live_stats[idx] = parsed
+
+            def _read_stderr(stream, lines):
+                for line in stream:
+                    lines.append(line)
+
+            t_out = threading.Thread(
+                target=_read_stdout, args=(proc.stdout, stdout_lines))
+            t_err = threading.Thread(
+                target=_read_stderr, args=(proc.stderr, stderr_lines))
+            t_out.start()
+            t_err.start()
+            t_out.join()
+            t_err.join()
+            proc.wait()
+            results[idx] = (proc.returncode,
+                            ''.join(stdout_lines),
+                            ''.join(stderr_lines))
 
         collectors = []
         for i, proc in enumerate(procs):
             t = threading.Thread(target=_collect, args=(i, proc))
             t.start()
             collectors.append(t)
+
+        # Live display loop: redraw T: lines in-place until all done
+        display_active = True
+        if not args.quiet:
+            for i in range(num_threads):
+                cpu, priority, interval = threads[i]
+                print(format_summary(i, procs[i].pid, priority, interval,
+                                     args.nsecs, 0, 0, 0, 0),
+                      file=sys.stderr)
+
+            def _display_loop():
+                while display_active:
+                    threading.Event().wait(timeout=1.0)
+                    if not display_active:
+                        break
+                    sys.stderr.write(f"\033[{num_threads}A")
+                    with live_stats_lock:
+                        snapshot = list(live_stats)
+                    for i in range(num_threads):
+                        cpu, priority, interval = threads[i]
+                        if snapshot[i]:
+                            lat_min, lat_avg, lat_max, act, count = snapshot[i]
+                        else:
+                            lat_min = lat_avg = lat_max = 0
+                            count = 0
+                        line = format_summary(
+                            i, procs[i].pid, priority, interval,
+                            args.nsecs, lat_min, lat_avg, lat_max, count)
+                        sys.stderr.write(f"\033[2K{line}\n")
+                    sys.stderr.flush()
+
+            display_thread = threading.Thread(target=_display_loop,
+                                              daemon=True)
+            display_thread.start()
+
         for t in collectors:
             t.join()
+
+        display_active = False
+        if not args.quiet:
+            # Final redraw with last stats
+            sys.stderr.write(f"\033[{num_threads}A")
+            for i in range(num_threads):
+                cpu, priority, interval = threads[i]
+                if live_stats[i]:
+                    lat_min, lat_avg, lat_max, act, count = live_stats[i]
+                else:
+                    lat_min = lat_avg = lat_max = 0
+                    count = 0
+                line = format_summary(
+                    i, procs[i].pid, priority, interval,
+                    args.nsecs, lat_min, lat_avg, lat_max, count)
+                sys.stderr.write(f"\033[2K{line}\n")
+            sys.stderr.flush()
 
         for i, (rc, _, stderr) in enumerate(results):
             if rc not in (0, -2, -signal.SIGINT):

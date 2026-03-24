@@ -33,10 +33,10 @@ Signed-off-by: Carsten Emde <C.Emde@osadl.org>
  kernel/workqueue.c                         |   32 
  17 files changed, 2226 insertions(+), 35 deletions(-)
 
-Index: linux-6.18.2/Documentation/trace/latency-histograms.txt
+Index: linux-6.19.4/Documentation/trace/latency-histograms.txt
 ===================================================================
 --- /dev/null
-+++ linux-6.18.2/Documentation/trace/latency-histograms.txt
++++ linux-6.19.4/Documentation/trace/latency-histograms.txt
 @@ -0,0 +1,221 @@
 +		Using the Linux Kernel Latency Histograms
 +                           by Carsten Emde
@@ -259,11 +259,10 @@ Index: linux-6.18.2/Documentation/trace/latency-histograms.txt
 +is provided.
 +
 +These data are also reset when the wakeup histogram is reset.
-
-Index: linux-6.18.2/fs/proc/array.c
+Index: linux-6.19.4/fs/proc/array.c
 ===================================================================
---- linux-6.18.2.orig/fs/proc/array.c
-+++ linux-6.18.2/fs/proc/array.c
+--- linux-6.19.4.orig/fs/proc/array.c
++++ linux-6.19.4/fs/proc/array.c
 @@ -98,7 +98,7 @@
  
  void proc_task_name(struct seq_file *m, struct task_struct *p, bool escape)
@@ -273,7 +272,7 @@ Index: linux-6.18.2/fs/proc/array.c
  
  	/*
  	 * Test before PF_KTHREAD because all workqueue worker threads are
-@@ -114,7 +114,7 @@ void proc_task_name(struct seq_file *m, struct task_struct *p, bool escape)
+@@ -114,7 +114,7 @@ void proc_task_name(struct seq_file *m,
  	if (escape)
  		seq_escape_str(m, tcomm, ESCAPE_SPACE | ESCAPE_SPECIAL, "\n\\");
  	else
@@ -282,11 +281,10 @@ Index: linux-6.18.2/fs/proc/array.c
  }
  
  /*
-
-Index: linux-6.18.2/include/linux/hrtimer_types.h
+Index: linux-6.19.4/include/linux/hrtimer_types.h
 ===================================================================
---- linux-6.18.2.orig/include/linux/hrtimer_types.h
-+++ linux-6.18.2/include/linux/hrtimer_types.h
+--- linux-6.19.4.orig/include/linux/hrtimer_types.h
++++ linux-6.19.4/include/linux/hrtimer_types.h
 @@ -29,6 +29,7 @@ enum hrtimer_restart {
   * @function:	timer expiry callback function
   * @base:	pointer to the timer base (per cpu and per clock)
@@ -305,12 +303,11 @@ Index: linux-6.18.2/include/linux/hrtimer_types.h
  	u8				is_rel;
  	u8				is_soft;
  	u8				is_hard;
-
-Index: linux-6.18.2/include/linux/kthread.h
+Index: linux-6.19.4/include/linux/kthread.h
 ===================================================================
---- linux-6.18.2.orig/include/linux/kthread.h
-+++ linux-6.18.2/include/linux/kthread.h
-@@ -34,6 +34,7 @@ struct task_struct *kthread_create_on_cpu(int (*threadfn)(void *data),
+--- linux-6.19.4.orig/include/linux/kthread.h
++++ linux-6.19.4/include/linux/kthread.h
+@@ -34,6 +34,7 @@ struct task_struct *kthread_create_on_cp
  					  const char *namefmt);
  
  void get_kthread_comm(char *buf, size_t buf_size, struct task_struct *tsk);
@@ -318,11 +315,10 @@ Index: linux-6.18.2/include/linux/kthread.h
  bool set_kthread_struct(struct task_struct *p);
  
  void kthread_set_per_cpu(struct task_struct *k, int cpu);
-
-Index: linux-6.18.2/include/linux/sched.h
+Index: linux-6.19.4/include/linux/sched.h
 ===================================================================
---- linux-6.18.2.orig/include/linux/sched.h
-+++ linux-6.18.2/include/linux/sched.h
+--- linux-6.19.4.orig/include/linux/sched.h
++++ linux-6.19.4/include/linux/sched.h
 @@ -90,6 +90,8 @@ struct user_event_mm;
  
  #include <linux/sched/ext.h>
@@ -332,7 +328,7 @@ Index: linux-6.18.2/include/linux/sched.h
  /*
   * Task state bitmask. NOTE! These bits are also
   * encoded in fs/proc/array.c: get_task_state().
-@@ -1526,6 +1528,20 @@ struct task_struct {
+@@ -1494,6 +1496,20 @@ struct task_struct {
  #ifdef CONFIG_TRACING
  	/* Bitmask and counter of trace recursion: */
  	unsigned long			trace_recursion;
@@ -353,11 +349,10 @@ Index: linux-6.18.2/include/linux/sched.h
  #endif /* CONFIG_TRACING */
  
  #ifdef CONFIG_KCOV
-
-Index: linux-6.18.2/include/linux/workqueue.h
+Index: linux-6.19.4/include/linux/workqueue.h
 ===================================================================
---- linux-6.18.2.orig/include/linux/workqueue.h
-+++ linux-6.18.2/include/linux/workqueue.h
+--- linux-6.19.4.orig/include/linux/workqueue.h
++++ linux-6.19.4/include/linux/workqueue.h
 @@ -639,6 +639,7 @@ extern void show_all_workqueues(void);
  extern void show_freezable_workqueues(void);
  extern void show_one_workqueue(struct workqueue_struct *wq);
@@ -366,11 +361,10 @@ Index: linux-6.18.2/include/linux/workqueue.h
  
  /**
   * queue_work - queue work on a workqueue
-
-Index: linux-6.18.2/include/trace/events/hist.h
+Index: linux-6.19.4/include/trace/events/hist.h
 ===================================================================
 --- /dev/null
-+++ linux-6.18.2/include/trace/events/hist.h
++++ linux-6.19.4/include/trace/events/hist.h
 @@ -0,0 +1,49 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +#undef TRACE_SYSTEM
@@ -421,11 +415,10 @@ Index: linux-6.18.2/include/trace/events/hist.h
 +
 +/* This part must be outside protection */
 +#include <trace/define_trace.h>
-
-Index: linux-6.18.2/include/trace/events/latency_hist.h
+Index: linux-6.19.4/include/trace/events/latency_hist.h
 ===================================================================
 --- /dev/null
-+++ linux-6.18.2/include/trace/events/latency_hist.h
++++ linux-6.19.4/include/trace/events/latency_hist.h
 @@ -0,0 +1,30 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +#ifndef _LATENCY_HIST_H
@@ -457,12 +450,11 @@ Index: linux-6.18.2/include/trace/events/latency_hist.h
 +}
 +
 +#endif /* _LATENCY_HIST_H */
-
-Index: linux-6.18.2/kernel/kthread.c
+Index: linux-6.19.4/kernel/kthread.c
 ===================================================================
---- linux-6.18.2.orig/kernel/kthread.c
-+++ linux-6.18.2/kernel/kthread.c
-@@ -116,6 +116,18 @@ void get_kthread_comm(char *buf, size_t buf_size, struct task_struct *tsk)
+--- linux-6.19.4.orig/kernel/kthread.c
++++ linux-6.19.4/kernel/kthread.c
+@@ -115,6 +115,18 @@ void get_kthread_comm(char *buf, size_t
  	strscpy_pad(buf, kthread->full_name, buf_size);
  }
  
@@ -481,11 +473,10 @@ Index: linux-6.18.2/kernel/kthread.c
  bool set_kthread_struct(struct task_struct *p)
  {
  	struct kthread *kthread;
-
-Index: linux-6.18.2/kernel/time/hrtimer.c
+Index: linux-6.19.4/kernel/time/hrtimer.c
 ===================================================================
---- linux-6.18.2.orig/kernel/time/hrtimer.c
-+++ linux-6.18.2/kernel/time/hrtimer.c
+--- linux-6.19.4.orig/kernel/time/hrtimer.c
++++ linux-6.19.4/kernel/time/hrtimer.c
 @@ -46,6 +46,7 @@
  #include <linux/uaccess.h>
  
@@ -494,7 +485,7 @@ Index: linux-6.18.2/kernel/time/hrtimer.c
  
  #include "tick-internal.h"
  
-@@ -1261,6 +1262,17 @@ static int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
+@@ -1260,6 +1261,17 @@ static int __hrtimer_start_range_ns(stru
  		new_base = base;
  	}
  
@@ -512,7 +503,7 @@ Index: linux-6.18.2/kernel/time/hrtimer.c
  	first = enqueue_hrtimer(timer, new_base, mode);
  	if (!force_local) {
  		/*
-@@ -1807,6 +1819,8 @@ static void __run_hrtimer(struct hrtimer_cpu_base *cpu_base,
+@@ -1806,6 +1818,8 @@ static void __run_hrtimer(struct hrtimer
  	base->running = NULL;
  }
  
@@ -521,7 +512,7 @@ Index: linux-6.18.2/kernel/time/hrtimer.c
  static void __hrtimer_run_queues(struct hrtimer_cpu_base *cpu_base, ktime_t now,
  				 unsigned long flags, unsigned int active_mask)
  {
-@@ -1824,6 +1838,15 @@ static void __hrtimer_run_queues(struct hrtimer_cpu_base *cpu_base, ktime_t now,
+@@ -1823,6 +1837,15 @@ static void __hrtimer_run_queues(struct
  
  			timer = container_of(node, struct hrtimer, node);
  
@@ -537,12 +528,11 @@ Index: linux-6.18.2/kernel/time/hrtimer.c
  			/*
  			 * The immediate goal for using the softexpires is
  			 * minimizing wakeups, not running timers at the
-
-Index: linux-6.18.2/kernel/trace/Kconfig
+Index: linux-6.19.4/kernel/trace/Kconfig
 ===================================================================
---- linux-6.18.2.orig/kernel/trace/Kconfig
-+++ linux-6.18.2/kernel/trace/Kconfig
-@@ -392,8 +392,8 @@ config IRQSOFF_TRACER
+--- linux-6.19.4.orig/kernel/trace/Kconfig
++++ linux-6.19.4/kernel/trace/Kconfig
+@@ -418,8 +418,8 @@ config IRQSOFF_TRACER
  	bool "Interrupts-off Latency Tracer"
  	default n
  	depends on TRACE_IRQFLAGS_SUPPORT
@@ -553,7 +543,7 @@ Index: linux-6.18.2/kernel/trace/Kconfig
  	select TRACER_MAX_TRACE
  	select RING_BUFFER_ALLOW_SWAP
  	select TRACER_SNAPSHOT
-@@ -433,9 +433,87 @@ config PREEMPT_TRACER
+@@ -459,9 +459,87 @@ config PREEMPT_TRACER
  	      echo 0 > /sys/kernel/tracing/tracing_max_latency
  
  	  (Note that kernel size and overhead increase with this option
@@ -642,7 +632,7 @@ Index: linux-6.18.2/kernel/trace/Kconfig
  config SCHED_TRACER
  	bool "Scheduling Latency Tracer"
  	select GENERIC_TRACER
-@@ -446,6 +524,76 @@ config SCHED_TRACER
+@@ -472,6 +550,76 @@ config SCHED_TRACER
  	  This tracer tracks the latency of the highest priority task
  	  to be scheduled in, starting from the point it has woken up.
  
@@ -719,12 +709,11 @@ Index: linux-6.18.2/kernel/trace/Kconfig
  config HWLAT_TRACER
  	bool "Tracer to detect hardware latencies (like SMIs)"
  	select GENERIC_TRACER
-
-Index: linux-6.18.2/kernel/trace/Makefile
+Index: linux-6.19.4/kernel/trace/Makefile
 ===================================================================
---- linux-6.18.2.orig/kernel/trace/Makefile
-+++ linux-6.18.2/kernel/trace/Makefile
-@@ -63,6 +63,11 @@ obj-$(CONFIG_IRQSOFF_TRACER) += trace_irqsoff.o
+--- linux-6.19.4.orig/kernel/trace/Makefile
++++ linux-6.19.4/kernel/trace/Makefile
+@@ -80,6 +80,11 @@ obj-$(CONFIG_IRQSOFF_TRACER) += trace_ir
  obj-$(CONFIG_PREEMPT_TRACER) += trace_irqsoff.o
  obj-$(CONFIG_SCHED_TRACER) += trace_sched_wakeup.o
  obj-$(CONFIG_HWLAT_TRACER) += trace_hwlat.o
@@ -736,11 +725,10 @@ Index: linux-6.18.2/kernel/trace/Makefile
  obj-$(CONFIG_OSNOISE_TRACER) += trace_osnoise.o
  obj-$(CONFIG_NOP_TRACER) += trace_nop.o
  obj-$(CONFIG_STACK_TRACER) += trace_stack.o
-
-Index: linux-6.18.2/kernel/trace/helper_latency_hist.h
+Index: linux-6.19.4/kernel/trace/helper_latency_hist.h
 ===================================================================
 --- /dev/null
-+++ linux-6.18.2/kernel/trace/helper_latency_hist.h
++++ linux-6.19.4/kernel/trace/helper_latency_hist.h
 @@ -0,0 +1,33 @@
 +#ifndef _LINUX_KERNEL_HELPER_LATENCY_HIST_H
 +#define _LINUX_KERNEL_HELPER_LATENCY_HIST_H
@@ -775,11 +763,10 @@ Index: linux-6.18.2/kernel/trace/helper_latency_hist.h
 +	} while (0)
 +#endif
 +#endif /* _LINUX_KERNEL_HELPER_LATENCY_HIST_H */
-
-Index: linux-6.18.2/kernel/trace/latency_hist.c
+Index: linux-6.19.4/kernel/trace/latency_hist.c
 ===================================================================
 --- /dev/null
-+++ linux-6.18.2/kernel/trace/latency_hist.c
++++ linux-6.19.4/kernel/trace/latency_hist.c
 @@ -0,0 +1,1639 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
@@ -2420,14 +2407,13 @@ Index: linux-6.18.2/kernel/trace/latency_hist.c
 +}
 +
 +device_initcall(latency_hist_init);
-
-Index: linux-6.18.2/kernel/trace/trace_irqsoff.c
+Index: linux-6.19.4/kernel/trace/trace_irqsoff.c
 ===================================================================
---- linux-6.18.2.orig/kernel/trace/trace_irqsoff.c
-+++ linux-6.18.2/kernel/trace/trace_irqsoff.c
-@@ -16,8 +16,10 @@
+--- linux-6.19.4.orig/kernel/trace/trace_irqsoff.c
++++ linux-6.19.4/kernel/trace/trace_irqsoff.c
+@@ -15,8 +15,10 @@
+ #include <linux/module.h>
  #include <linux/ftrace.h>
- #include <linux/irqstage.h>
  #include <linux/kprobes.h>
 +#include <trace/events/hist.h>
  
@@ -2436,7 +2422,7 @@ Index: linux-6.18.2/kernel/trace/trace_irqsoff.c
  
  #include <trace/events/preemptirq.h>
  
-@@ -467,12 +469,14 @@ void start_critical_timings(void)
+@@ -466,12 +468,14 @@ void start_critical_timings(void)
  {
  	if (preempt_trace(preempt_count()) || irq_trace())
  		start_critical_timing(CALLER_ADDR0, CALLER_ADDR1);
@@ -2451,7 +2437,7 @@ Index: linux-6.18.2/kernel/trace/trace_irqsoff.c
  	if (preempt_trace(preempt_count()) || irq_trace())
  		stop_critical_timing(CALLER_ADDR0, CALLER_ADDR1);
  }
-@@ -636,6 +640,7 @@ static void irqsoff_tracer_stop(struct trace_array *tr)
+@@ -635,6 +639,7 @@ static void irqsoff_tracer_stop(struct t
   */
  void tracer_hardirqs_on(unsigned long a0, unsigned long a1)
  {
@@ -2459,7 +2445,7 @@ Index: linux-6.18.2/kernel/trace/trace_irqsoff.c
  	if (!preempt_trace(preempt_count()) && irq_trace())
  		stop_critical_timing(a0, a1);
  }
-@@ -645,6 +650,7 @@ void tracer_hardirqs_off(unsigned long a0, unsigned long a1)
+@@ -644,6 +649,7 @@ void tracer_hardirqs_off(unsigned long a
  {
  	if (!preempt_trace(preempt_count()) && irq_trace())
  		start_critical_timing(a0, a1);
@@ -2467,14 +2453,13 @@ Index: linux-6.18.2/kernel/trace/trace_irqsoff.c
  }
  NOKPROBE_SYMBOL(tracer_hardirqs_off);
  
-
-Index: linux-6.18.2/kernel/trace/trace_preemptirq.c
+Index: linux-6.19.4/kernel/trace/trace_preemptirq.c
 ===================================================================
---- linux-6.18.2.orig/kernel/trace/trace_preemptirq.c
-+++ linux-6.18.2/kernel/trace/trace_preemptirq.c
-@@ -13,40 +13,11 @@
+--- linux-6.19.4.orig/kernel/trace/trace_preemptirq.c
++++ linux-6.19.4/kernel/trace/trace_preemptirq.c
+@@ -12,40 +12,11 @@
+ #include <linux/kprobes.h>
  #include <linux/hardirq.h>
- #include <linux/irq_pipeline.h>
  #include "trace.h"
 +#include "helper_latency_hist.h"
  
@@ -2514,12 +2499,11 @@ Index: linux-6.18.2/kernel/trace/trace_preemptirq.c
  #ifdef CONFIG_TRACE_IRQFLAGS
  /* Per-cpu variable to prevent redundant calls when IRQs already off */
  static DEFINE_PER_CPU(int, tracing_irq_cpu);
-
-Index: linux-6.18.2/kernel/workqueue.c
+Index: linux-6.19.4/kernel/workqueue.c
 ===================================================================
---- linux-6.18.2.orig/kernel/workqueue.c
-+++ linux-6.18.2/kernel/workqueue.c
-@@ -6519,6 +6519,38 @@ void wq_worker_comm(char *buf, size_t size, struct task_struct *task)
+--- linux-6.19.4.orig/kernel/workqueue.c
++++ linux-6.19.4/kernel/workqueue.c
+@@ -6558,6 +6558,38 @@ void wq_worker_comm(char *buf, size_t si
  	mutex_unlock(&wq_pool_attach_mutex);
  }
  
