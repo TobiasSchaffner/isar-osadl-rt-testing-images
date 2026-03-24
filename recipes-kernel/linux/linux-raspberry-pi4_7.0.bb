@@ -9,6 +9,9 @@
 inherit linux-kernel
 require osadl-patches.inc
 
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.0.0/osadl-preemptrt:"
+require osadl-patches.inc
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += "git://github.com/raspberrypi/linux.git;protocol=https;branch=rpi-${PV}.y;destsuffix=linux-rpi4-${PV} \

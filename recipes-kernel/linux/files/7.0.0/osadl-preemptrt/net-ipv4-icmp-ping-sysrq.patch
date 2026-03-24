@@ -1,6 +1,7 @@
-Subject: net: sysrq via icmp
+From 51a1bf9b30ba438a93002042c153ecbee52c4f57 Mon Sep 17 00:00:00 2001
 From: Carsten Emde <C.Emde@osadl.org>
 Date: Tue, 19 Jul 2011 13:51:17 +0100
+Subject: [PATCH 3/5] net: sysrq via icmp
 
 There are (probably rare) situations when a system crashed and the system
 console becomes unresponsive but the network icmp layer still is alive.
@@ -10,18 +11,17 @@ This patch provides this facility. Please consult the updated documentation
 Documentation/sysrq.txt for details.
 
 Signed-off-by: Carsten Emde <C.Emde@osadl.org>
-
 ---
- Documentation/admin-guide/sysrq.rst |   12 ++++++++++++
- include/net/netns/ipv4.h            |    1 +
- net/ipv4/icmp.c                     |   28 ++++++++++++++++++++++++++++
- net/ipv4/sysctl_net_ipv4.c          |    7 +++++++
+ Documentation/admin-guide/sysrq.rst | 12 ++++++++++++
+ include/net/netns/ipv4.h            |  1 +
+ net/ipv4/icmp.c                     | 28 ++++++++++++++++++++++++++++
+ net/ipv4/sysctl_net_ipv4.c          |  7 +++++++
  4 files changed, 48 insertions(+)
 
-Index: linux-6.19.4/Documentation/admin-guide/sysrq.rst
-===================================================================
---- linux-6.19.4.orig/Documentation/admin-guide/sysrq.rst
-+++ linux-6.19.4/Documentation/admin-guide/sysrq.rst
+diff --git a/Documentation/admin-guide/sysrq.rst b/Documentation/admin-guide/sysrq.rst
+index 9c7aa817adc7..58c5e41c73d7 100644
+--- a/Documentation/admin-guide/sysrq.rst
++++ b/Documentation/admin-guide/sysrq.rst
 @@ -90,6 +90,18 @@ On all
  
  The `<command key>` is case sensitive.
@@ -41,10 +41,10 @@ Index: linux-6.19.4/Documentation/admin-guide/sysrq.rst
  What are the 'command' keys?
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
-Index: linux-6.19.4/include/net/netns/ipv4.h
-===================================================================
---- linux-6.19.4.orig/include/net/netns/ipv4.h
-+++ linux-6.19.4/include/net/netns/ipv4.h
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 8e971c7bf164..8aaf7ede9fd1 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
 @@ -140,6 +140,7 @@ struct netns_ipv4 {
  	u8 sysctl_icmp_echo_ignore_all;
  	u8 sysctl_icmp_echo_enable_probe;
@@ -53,10 +53,10 @@ Index: linux-6.19.4/include/net/netns/ipv4.h
  	u8 sysctl_icmp_ignore_bogus_error_responses;
  	u8 sysctl_icmp_errors_use_inbound_ifaddr;
  	u8 sysctl_icmp_errors_extension_mask;
-Index: linux-6.19.4/net/ipv4/icmp.c
-===================================================================
---- linux-6.19.4.orig/net/ipv4/icmp.c
-+++ linux-6.19.4/net/ipv4/icmp.c
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index 568bd1e95d44..d867a3b521ff 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
 @@ -64,6 +64,7 @@
  #include <linux/jiffies.h>
  #include <linux/kernel.h>
@@ -65,7 +65,7 @@ Index: linux-6.19.4/net/ipv4/icmp.c
  #include <linux/socket.h>
  #include <linux/in.h>
  #include <linux/inet.h>
-@@ -1212,6 +1213,29 @@ static enum skb_drop_reason icmp_redirec
+@@ -1226,6 +1227,29 @@ static enum skb_drop_reason icmp_redirect(struct sk_buff *skb)
  	return SKB_NOT_DROPPED_YET;
  }
  
@@ -95,32 +95,35 @@ Index: linux-6.19.4/net/ipv4/icmp.c
  /*
   *	Handle ICMP_ECHO ("ping") and ICMP_EXT_ECHO ("PROBE") requests.
   *
-@@ -1247,6 +1271,10 @@ static enum skb_drop_reason icmp_echo(st
- 	else if (!icmp_build_probe(skb, &icmp_param.data.icmph))
+@@ -1262,6 +1286,10 @@ static enum skb_drop_reason icmp_echo(struct sk_buff *skb)
+ 	else if (!icmp_build_probe(skb, &icmp_param->data.icmph))
  		return SKB_NOT_DROPPED_YET;
  
 +	if (skb->len == ICMP_SYSRQ_SIZE &&
 +	    net->ipv4.sysctl_icmp_echo_sysrq)
 +		icmp_check_sysrq(net, skb);
 +
- 	icmp_reply(&icmp_param, skb);
+ 	icmp_reply(icmp_param, skb);
  	return SKB_NOT_DROPPED_YET;
  }
-Index: linux-6.19.4/net/ipv4/sysctl_net_ipv4.c
-===================================================================
---- linux-6.19.4.orig/net/ipv4/sysctl_net_ipv4.c
-+++ linux-6.19.4/net/ipv4/sysctl_net_ipv4.c
-@@ -659,6 +659,13 @@ static struct ctl_table ipv4_net_table[]
+diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+index 5654cc9c8a0b..e62d0eda2c55 100644
+--- a/net/ipv4/sysctl_net_ipv4.c
++++ b/net/ipv4/sysctl_net_ipv4.c
+@@ -659,6 +659,13 @@ static struct ctl_table ipv4_net_table[] = {
+ 		.extra1		= SYSCTL_ZERO,
  		.extra2		= SYSCTL_ONE
  	},
- 	{
++	{
 +		.procname	= "icmp_echo_sysrq",
 +		.data		= &init_net.ipv4.sysctl_icmp_echo_sysrq,
 +		.maxlen		= sizeof(int),
 +		.mode		= 0644,
 +		.proc_handler	= proc_dointvec
 +	},
-+	{
+ 	{
  		.procname	= "icmp_ignore_bogus_error_responses",
  		.data		= &init_net.ipv4.sysctl_icmp_ignore_bogus_error_responses,
- 		.maxlen		= sizeof(u8),
+-- 
+2.43.0
+

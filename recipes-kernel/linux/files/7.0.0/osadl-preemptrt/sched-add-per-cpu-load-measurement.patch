@@ -1,6 +1,8 @@
-Subject: Provide individual CPU usage measurement based on idle time
+From 413a79eb060d381ccb592c3ad49e3d7ba18fed2c Mon Sep 17 00:00:00 2001
 From: Carsten Emde <C.Emde@osadl.org>
-Date: Fri,  4 Sep 2015 20:41:40 +0100
+Date: Fri, 4 Sep 2015 20:41:40 +0100
+Subject: [PATCH 5/5] Provide individual CPU usage measurement based on idle
+ time
 
 The various methods to determine CPU usage and load have a number of
 disadvantages (see also Documentation/cpu-load.txt), and a
@@ -36,20 +38,20 @@ awk '{ print (100.0*$2) / ($1+$2)"%" }' </proc/idleruntime/all/data
 To reset the counters althogether write to /proc/idleruntime/all/reset.
 
 Signed-off-by: Carsten Emde <C.Emde@osadl.org>
-
 ---
- init/Kconfig                   |   28 +++++
- kernel/sched/Makefile          |    2 
- kernel/sched/core.c            |   31 +++++
- kernel/sched/cpu_idleruntime.c |  227 +++++++++++++++++++++++++++++++++++++++++
- kernel/sched/sched.h           |    8 +
+ init/Kconfig                   |  28 ++++
+ kernel/sched/Makefile          |   2 +
+ kernel/sched/core.c            |  31 +++++
+ kernel/sched/cpu_idleruntime.c | 227 +++++++++++++++++++++++++++++++++
+ kernel/sched/sched.h           |   8 ++
  5 files changed, 296 insertions(+)
+ create mode 100644 kernel/sched/cpu_idleruntime.c
 
-Index: linux-6.19.4/init/Kconfig
-===================================================================
---- linux-6.19.4.orig/init/Kconfig
-+++ linux-6.19.4/init/Kconfig
-@@ -649,6 +649,34 @@ config BSD_PROCESS_ACCT_V3
+diff --git a/init/Kconfig b/init/Kconfig
+index 4fdbd1d83528..1403cd027ad8 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -664,6 +664,34 @@ config BSD_PROCESS_ACCT_V3
  	  for processing it. A preliminary version of these tools is available
  	  at <http://www.gnu.org/software/acct/>.
  
@@ -84,21 +86,21 @@ Index: linux-6.19.4/init/Kconfig
  config TASKSTATS
  	bool "Export task/process statistics through netlink"
  	depends on NET
-Index: linux-6.19.4/kernel/sched/Makefile
-===================================================================
---- linux-6.19.4.orig/kernel/sched/Makefile
-+++ linux-6.19.4/kernel/sched/Makefile
-@@ -37,3 +37,5 @@ obj-y += core.o
+diff --git a/kernel/sched/Makefile b/kernel/sched/Makefile
+index b1f1a367034f..5da1e899e117 100644
+--- a/kernel/sched/Makefile
++++ b/kernel/sched/Makefile
+@@ -40,3 +40,5 @@ obj-y += core.o
  obj-y += fair.o
  obj-y += build_policy.o
  obj-y += build_utility.o
 +obj-y += cpu_idleruntime.o
 +
-Index: linux-6.19.4/kernel/sched/core.c
-===================================================================
---- linux-6.19.4.orig/kernel/sched/core.c
-+++ linux-6.19.4/kernel/sched/core.c
-@@ -5055,6 +5055,37 @@ prepare_task_switch(struct rq *rq, struc
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 496dff740dca..c436ebfc12f0 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -5088,6 +5088,37 @@ prepare_task_switch(struct rq *rq, struct task_struct *prev,
  	kmap_local_sched_out();
  	prepare_task(next);
  	prepare_arch_switch(next);
@@ -136,10 +138,11 @@ Index: linux-6.19.4/kernel/sched/core.c
  }
  
  /**
-Index: linux-6.19.4/kernel/sched/cpu_idleruntime.c
-===================================================================
+diff --git a/kernel/sched/cpu_idleruntime.c b/kernel/sched/cpu_idleruntime.c
+new file mode 100644
+index 000000000000..e6747e0ba4f6
 --- /dev/null
-+++ linux-6.19.4/kernel/sched/cpu_idleruntime.c
++++ b/kernel/sched/cpu_idleruntime.c
 @@ -0,0 +1,227 @@
 +/*
 +   cpu_idleruntime.c: provide CPU usage data based on idle processing
@@ -368,11 +371,11 @@ Index: linux-6.19.4/kernel/sched/cpu_idleruntime.c
 +}
 +
 +early_initcall(idleruntime_init);
-Index: linux-6.19.4/kernel/sched/sched.h
-===================================================================
---- linux-6.19.4.orig/kernel/sched/sched.h
-+++ linux-6.19.4/kernel/sched/sched.h
-@@ -1956,6 +1956,14 @@ static inline struct rq *this_rq_lock_ir
+diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+index 43bbf0693cca..0a2f2555a108 100644
+--- a/kernel/sched/sched.h
++++ b/kernel/sched/sched.h
+@@ -2004,6 +2004,14 @@ static inline struct rq *_this_rq_lock_irq(struct rq_flags *rf) __acquires_ret
  	return rq;
  }
  
@@ -387,3 +390,6 @@ Index: linux-6.19.4/kernel/sched/sched.h
  #ifdef CONFIG_NUMA
  
  enum numa_topology_type {
+-- 
+2.43.0
+

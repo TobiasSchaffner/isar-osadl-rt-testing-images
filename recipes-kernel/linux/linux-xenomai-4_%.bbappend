@@ -5,6 +5,8 @@
 #  Tobias Schaffner <tobias.schaffner@siemens.com>
 #
 # SPDX-License-Identifier: MIT
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.0.0/osadl-evl:"
 require osadl-patches.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
