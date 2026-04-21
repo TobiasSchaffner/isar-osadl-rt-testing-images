@@ -20,6 +20,7 @@ local_conf_header:
     MACHINE_HOSTNAME = "osadl-rt-test-rpi4-evl"
   kernel: |
     KERNEL_NAME = "xenomai-4"
+    PREFERRED_VERSION_linux-xenomai-4 = "7.0"
   wks: |
     WKS_FILE_NAME = "rpi4.wks"
   arch: |

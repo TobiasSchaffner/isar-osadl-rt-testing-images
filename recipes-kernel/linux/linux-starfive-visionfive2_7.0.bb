@@ -19,7 +19,7 @@ SRC_URI += "git://github.com/torvalds/linux.git;protocol=https;nobranch=1;destsu
             file://preempt-rt.cfg \
             file://realtime.cfg"
 
-SRCREV = "e9ec05addd1a067fc7cb218f20ecdc1b1b0898c0"
+SRCREV = "028ef9c96e96197026887c0f092424679298aae8"
 
 S = "${WORKDIR}/linux-visionfive-${PV}"
 

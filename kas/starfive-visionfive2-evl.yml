@@ -22,5 +22,6 @@ local_conf_header:
     WKS_FILE_NAME = "starfive-visionfive2.wks.in"
   kernel: |
     KERNEL_NAME = "xenomai-4"
+    PREFERRED_VERSION_linux-raspberry-pi4 = "7.0"
   dtb: |
     DTB_FILES = "starfive/jh7110-starfive-visionfive-2-v1.2a.dtb starfive/jh7110-starfive-visionfive-2-v1.3b.dtb"
