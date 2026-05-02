@@ -34,6 +34,9 @@ repos:
       0001-allow-custom-kernel.patch:
         path: xenomai-images-patches/0001-allow-custom-kernel.patch
         repo: isar-osadl-rt-testing-images
+      0001-Use-personal-linux-repository.patch:
+        path: xenomai-images-patches/0001-Use-personal-linux-repository.patch
+        repo: isar-osadl-rt-testing-images
 
 local_conf_header:
   cross: |
