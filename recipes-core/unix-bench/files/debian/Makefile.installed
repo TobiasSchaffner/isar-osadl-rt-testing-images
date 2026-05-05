@@ -1,0 +1,4 @@
+# Stub Makefile shipped to /opt/unix-bench so that UnixBench's Run script
+# does not attempt to recompile binaries on the target.
+all:
+	@true
