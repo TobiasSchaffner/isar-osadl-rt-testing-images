@@ -26,7 +26,7 @@ repos:
         repo: isar-osadl-rt-testing-images
   xenomai-images:
     url: https://gitlab.com/Xenomai/xenomai-images.git
-    commit: 392ab5561833b35bf2336acb5f9f8e854034813c
+    commit: 74664edd99cb44c830060207c4dcf5c9ff83c341
     patches:
       0001-Allow-to-tune-the-rpi4-commandline.patch:
         path: xenomai-images-patches/0001-Allow-to-tune-the-rpi4-commandline.patch

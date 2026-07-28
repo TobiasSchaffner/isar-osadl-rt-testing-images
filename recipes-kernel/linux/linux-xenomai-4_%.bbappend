@@ -13,5 +13,3 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "file://realtime.cfg"
 
 SRC_URI += "${@'file://dbg.cfg' if d.getVar('XENOMAI_DEBUG') == '1' else ''}"
-
-FILESEXTRAPATHS:prepend := "${THISDIR}/files/7.0.0/evl:"
