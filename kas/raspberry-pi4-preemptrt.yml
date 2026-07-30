@@ -18,5 +18,5 @@ local_conf_header:
   wks: |
     WKS_FILE = "rpi4.wks"
   kernel: |
-    KERNEL_NAME="raspberry-pi4"
+    KERNEL_NAME="preemptrt"
     PREFERRED_VERSION_linux-raspberry-pi4 = "7.0"

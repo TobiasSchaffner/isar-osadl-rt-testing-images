@@ -6,10 +6,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.0.0/osadl-evl:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.0.0/osadl:"
 require osadl-patches.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "file://realtime.cfg"
 
 SRC_URI += "${@'file://dbg.cfg' if d.getVar('XENOMAI_DEBUG') == '1' else ''}"
+
+SRCREV = "e0f16425093bdecb38aa435434aa2149b1efe7a4"

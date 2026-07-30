@@ -1,7 +1,6 @@
-From fa278c6891a17e66b07cdbb10e8f547529ee8e89 Mon Sep 17 00:00:00 2001
 From: Carsten Emde <C.Emde@osadl.org>
-Date: Mon, 9 Jul 2018 15:47:14 +0100
-Subject: [PATCH 2/5] tracing: Add latency histograms
+Date: Sat,  9 Jul 2018 15:47:14 +0100
+Subject: [PATCH] tracing: Add latency histograms
 
 This patch provides a recording mechanism to store data of potential and
 effective sources of system latencies. The recordings separately
@@ -13,36 +12,31 @@ are accessible via the debug filesystem. For details please consult
 Documentation/trace/latency-histograms.txt.
 
 Signed-off-by: Carsten Emde <C.Emde@osadl.org>
+
 ---
  Documentation/trace/latency-histograms.txt |  221 +++
- fs/proc/array.c                            |    4 +-
- include/linux/hrtimer_types.h              |    4 +
- include/linux/kthread.h                    |    1 +
- include/linux/sched.h                      |   16 +
- include/linux/workqueue.h                  |    1 +
- include/trace/events/hist.h                |   49 +
- include/trace/events/latency_hist.h        |   30 +
- kernel/kthread.c                           |   12 +
- kernel/time/hrtimer.c                      |   23 +
- kernel/trace/Kconfig                       |  154 +-
- kernel/trace/Makefile                      |    5 +
- kernel/trace/helper_latency_hist.h         |   33 +
- kernel/trace/latency_hist.c                | 1639 ++++++++++++++++++++
- kernel/trace/trace_irqsoff.c               |    6 +
- kernel/trace/trace_preemptirq.c            |   31 +-
- kernel/workqueue.c                         |   32 +
+ fs/proc/array.c                            |    4 
+ include/linux/hrtimer_types.h              |    4 
+ include/linux/kthread.h                    |    1 
+ include/linux/sched.h                      |   16 
+ include/linux/workqueue.h                  |    1 
+ include/trace/events/hist.h                |   49 
+ include/trace/events/latency_hist.h        |   30 
+ kernel/kthread.c                           |   12 
+ kernel/time/hrtimer.c                      |   23 
+ kernel/trace/Kconfig                       |  154 ++
+ kernel/trace/Makefile                      |    5 
+ kernel/trace/helper_latency_hist.h         |   33 
+ kernel/trace/latency_hist.c                | 1639 +++++++++++++++++++++++++++++
+ kernel/trace/trace_irqsoff.c               |    6 
+ kernel/trace/trace_preemptirq.c            |   31 
+ kernel/workqueue.c                         |   32 
  17 files changed, 2226 insertions(+), 35 deletions(-)
- create mode 100644 Documentation/trace/latency-histograms.txt
- create mode 100644 include/trace/events/hist.h
- create mode 100644 include/trace/events/latency_hist.h
- create mode 100644 kernel/trace/helper_latency_hist.h
- create mode 100644 kernel/trace/latency_hist.c
 
-diff --git a/Documentation/trace/latency-histograms.txt b/Documentation/trace/latency-histograms.txt
-new file mode 100644
-index 000000000000..14c86dd601e7
+Index: linux-7.0.1-rt2/Documentation/trace/latency-histograms.txt
+===================================================================
 --- /dev/null
-+++ b/Documentation/trace/latency-histograms.txt
++++ linux-7.0.1-rt2/Documentation/trace/latency-histograms.txt
 @@ -0,0 +1,221 @@
 +		Using the Linux Kernel Latency Histograms
 +                           by Carsten Emde
@@ -265,10 +259,10 @@ index 000000000000..14c86dd601e7
 +is provided.
 +
 +These data are also reset when the wakeup histogram is reset.
-diff --git a/fs/proc/array.c b/fs/proc/array.c
-index f447e734612a..de744c1d9a34 100644
---- a/fs/proc/array.c
-+++ b/fs/proc/array.c
+Index: linux-7.0.1-rt2/fs/proc/array.c
+===================================================================
+--- linux-7.0.1-rt2.orig/fs/proc/array.c
++++ linux-7.0.1-rt2/fs/proc/array.c
 @@ -99,7 +99,7 @@
  
  void proc_task_name(struct seq_file *m, struct task_struct *p, bool escape)
@@ -278,7 +272,7 @@ index f447e734612a..de744c1d9a34 100644
  
  	/*
  	 * Test before PF_KTHREAD because all workqueue worker threads are
-@@ -115,7 +115,7 @@ void proc_task_name(struct seq_file *m, struct task_struct *p, bool escape)
+@@ -115,7 +115,7 @@ void proc_task_name(struct seq_file *m,
  	if (escape)
  		seq_escape_str(m, tcomm, ESCAPE_SPACE | ESCAPE_SPECIAL, "\n\\");
  	else
@@ -287,10 +281,10 @@ index f447e734612a..de744c1d9a34 100644
  }
  
  /*
-diff --git a/include/linux/hrtimer_types.h b/include/linux/hrtimer_types.h
-index 8fbbb6bdf7a1..39ff35d6f830 100644
---- a/include/linux/hrtimer_types.h
-+++ b/include/linux/hrtimer_types.h
+Index: linux-7.0.1-rt2/include/linux/hrtimer_types.h
+===================================================================
+--- linux-7.0.1-rt2.orig/include/linux/hrtimer_types.h
++++ linux-7.0.1-rt2/include/linux/hrtimer_types.h
 @@ -29,6 +29,7 @@ enum hrtimer_restart {
   * @function:	timer expiry callback function
   * @base:	pointer to the timer base (per cpu and per clock)
@@ -309,11 +303,11 @@ index 8fbbb6bdf7a1..39ff35d6f830 100644
  	u8				is_rel;
  	u8				is_soft;
  	u8				is_hard;
-diff --git a/include/linux/kthread.h b/include/linux/kthread.h
-index a01a474719a7..67d78a74527a 100644
---- a/include/linux/kthread.h
-+++ b/include/linux/kthread.h
-@@ -52,6 +52,7 @@ struct task_struct *kthread_create_on_cpu(int (*threadfn)(void *data),
+Index: linux-7.0.1-rt2/include/linux/kthread.h
+===================================================================
+--- linux-7.0.1-rt2.orig/include/linux/kthread.h
++++ linux-7.0.1-rt2/include/linux/kthread.h
+@@ -52,6 +52,7 @@ struct task_struct *kthread_create_on_cp
  					  const char *namefmt);
  
  void get_kthread_comm(char *buf, size_t buf_size, struct task_struct *tsk);
@@ -321,10 +315,10 @@ index a01a474719a7..67d78a74527a 100644
  bool set_kthread_struct(struct task_struct *p);
  
  void kthread_set_per_cpu(struct task_struct *k, int cpu);
-diff --git a/include/linux/sched.h b/include/linux/sched.h
-index 9a059d26d3c3..8948ee225db2 100644
---- a/include/linux/sched.h
-+++ b/include/linux/sched.h
+Index: linux-7.0.1-rt2/include/linux/sched.h
+===================================================================
+--- linux-7.0.1-rt2.orig/include/linux/sched.h
++++ linux-7.0.1-rt2/include/linux/sched.h
 @@ -92,6 +92,8 @@ struct user_event_mm;
  
  #include <linux/sched/ext.h>
@@ -334,7 +328,7 @@ index 9a059d26d3c3..8948ee225db2 100644
  /*
   * Task state bitmask. NOTE! These bits are also
   * encoded in fs/proc/array.c: get_task_state().
-@@ -1505,6 +1507,20 @@ struct task_struct {
+@@ -1495,6 +1497,20 @@ struct task_struct {
  #ifdef CONFIG_TRACING
  	/* Bitmask and counter of trace recursion: */
  	unsigned long			trace_recursion;
@@ -355,10 +349,10 @@ index 9a059d26d3c3..8948ee225db2 100644
  #endif /* CONFIG_TRACING */
  
  #ifdef CONFIG_KCOV
-diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
-index a4749f56398f..d6ad8c6f53a0 100644
---- a/include/linux/workqueue.h
-+++ b/include/linux/workqueue.h
+Index: linux-7.0.1-rt2/include/linux/workqueue.h
+===================================================================
+--- linux-7.0.1-rt2.orig/include/linux/workqueue.h
++++ linux-7.0.1-rt2/include/linux/workqueue.h
 @@ -639,6 +639,7 @@ extern void show_all_workqueues(void);
  extern void show_freezable_workqueues(void);
  extern void show_one_workqueue(struct workqueue_struct *wq);
@@ -367,11 +361,10 @@ index a4749f56398f..d6ad8c6f53a0 100644
  
  /**
   * queue_work - queue work on a workqueue
-diff --git a/include/trace/events/hist.h b/include/trace/events/hist.h
-new file mode 100644
-index 000000000000..37856f82a41a
+Index: linux-7.0.1-rt2/include/trace/events/hist.h
+===================================================================
 --- /dev/null
-+++ b/include/trace/events/hist.h
++++ linux-7.0.1-rt2/include/trace/events/hist.h
 @@ -0,0 +1,49 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +#undef TRACE_SYSTEM
@@ -422,11 +415,10 @@ index 000000000000..37856f82a41a
 +
 +/* This part must be outside protection */
 +#include <trace/define_trace.h>
-diff --git a/include/trace/events/latency_hist.h b/include/trace/events/latency_hist.h
-new file mode 100644
-index 000000000000..de311e1aca89
+Index: linux-7.0.1-rt2/include/trace/events/latency_hist.h
+===================================================================
 --- /dev/null
-+++ b/include/trace/events/latency_hist.h
++++ linux-7.0.1-rt2/include/trace/events/latency_hist.h
 @@ -0,0 +1,30 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +#ifndef _LATENCY_HIST_H
@@ -458,11 +450,11 @@ index 000000000000..de311e1aca89
 +}
 +
 +#endif /* _LATENCY_HIST_H */
-diff --git a/kernel/kthread.c b/kernel/kthread.c
-index 6d3a6c028ec7..89a307e9916a 100644
---- a/kernel/kthread.c
-+++ b/kernel/kthread.c
-@@ -98,6 +98,18 @@ void get_kthread_comm(char *buf, size_t buf_size, struct task_struct *tsk)
+Index: linux-7.0.1-rt2/kernel/kthread.c
+===================================================================
+--- linux-7.0.1-rt2.orig/kernel/kthread.c
++++ linux-7.0.1-rt2/kernel/kthread.c
+@@ -97,6 +97,18 @@ void get_kthread_comm(char *buf, size_t
  	strscpy_pad(buf, kthread->full_name, buf_size);
  }
  
@@ -481,10 +473,10 @@ index 6d3a6c028ec7..89a307e9916a 100644
  bool set_kthread_struct(struct task_struct *p)
  {
  	struct kthread *kthread;
-diff --git a/kernel/time/hrtimer.c b/kernel/time/hrtimer.c
-index 9c941b8c5e2f..ea576b37e96f 100644
---- a/kernel/time/hrtimer.c
-+++ b/kernel/time/hrtimer.c
+Index: linux-7.0.1-rt2/kernel/time/hrtimer.c
+===================================================================
+--- linux-7.0.1-rt2.orig/kernel/time/hrtimer.c
++++ linux-7.0.1-rt2/kernel/time/hrtimer.c
 @@ -46,6 +46,7 @@
  #include <linux/uaccess.h>
  
@@ -493,7 +485,7 @@ index 9c941b8c5e2f..ea576b37e96f 100644
  
  #include "tick-internal.h"
  
-@@ -1269,6 +1270,17 @@ static int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim,
+@@ -1268,6 +1269,17 @@ static int __hrtimer_start_range_ns(stru
  		new_base = base;
  	}
  
@@ -511,7 +503,7 @@ index 9c941b8c5e2f..ea576b37e96f 100644
  	first = enqueue_hrtimer(timer, new_base, mode);
  	if (!force_local) {
  		/*
-@@ -1815,6 +1827,8 @@ static void __run_hrtimer(struct hrtimer_cpu_base *cpu_base,
+@@ -1814,6 +1826,8 @@ static void __run_hrtimer(struct hrtimer
  	base->running = NULL;
  }
  
@@ -520,7 +512,7 @@ index 9c941b8c5e2f..ea576b37e96f 100644
  static void __hrtimer_run_queues(struct hrtimer_cpu_base *cpu_base, ktime_t now,
  				 unsigned long flags, unsigned int active_mask)
  {
-@@ -1832,6 +1846,15 @@ static void __hrtimer_run_queues(struct hrtimer_cpu_base *cpu_base, ktime_t now,
+@@ -1831,6 +1845,15 @@ static void __hrtimer_run_queues(struct
  
  			timer = container_of(node, struct hrtimer, node);
  
@@ -536,10 +528,10 @@ index 9c941b8c5e2f..ea576b37e96f 100644
  			/*
  			 * The immediate goal for using the softexpires is
  			 * minimizing wakeups, not running timers at the
-diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
-index 49de13cae428..2ef2c3e3ee91 100644
---- a/kernel/trace/Kconfig
-+++ b/kernel/trace/Kconfig
+Index: linux-7.0.1-rt2/kernel/trace/Kconfig
+===================================================================
+--- linux-7.0.1-rt2.orig/kernel/trace/Kconfig
++++ linux-7.0.1-rt2/kernel/trace/Kconfig
 @@ -422,8 +422,8 @@ config IRQSOFF_TRACER
  	bool "Interrupts-off Latency Tracer"
  	default n
@@ -717,11 +709,11 @@ index 49de13cae428..2ef2c3e3ee91 100644
  config HWLAT_TRACER
  	bool "Tracer to detect hardware latencies (like SMIs)"
  	select GENERIC_TRACER
-diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
-index 04096c21d06b..91bcd6a5c497 100644
---- a/kernel/trace/Makefile
-+++ b/kernel/trace/Makefile
-@@ -81,6 +81,11 @@ obj-$(CONFIG_IRQSOFF_TRACER) += trace_irqsoff.o
+Index: linux-7.0.1-rt2/kernel/trace/Makefile
+===================================================================
+--- linux-7.0.1-rt2.orig/kernel/trace/Makefile
++++ linux-7.0.1-rt2/kernel/trace/Makefile
+@@ -81,6 +81,11 @@ obj-$(CONFIG_IRQSOFF_TRACER) += trace_ir
  obj-$(CONFIG_PREEMPT_TRACER) += trace_irqsoff.o
  obj-$(CONFIG_SCHED_TRACER) += trace_sched_wakeup.o
  obj-$(CONFIG_HWLAT_TRACER) += trace_hwlat.o
@@ -733,11 +725,10 @@ index 04096c21d06b..91bcd6a5c497 100644
  obj-$(CONFIG_OSNOISE_TRACER) += trace_osnoise.o
  obj-$(CONFIG_NOP_TRACER) += trace_nop.o
  obj-$(CONFIG_STACK_TRACER) += trace_stack.o
-diff --git a/kernel/trace/helper_latency_hist.h b/kernel/trace/helper_latency_hist.h
-new file mode 100644
-index 000000000000..310e85e7316b
+Index: linux-7.0.1-rt2/kernel/trace/helper_latency_hist.h
+===================================================================
 --- /dev/null
-+++ b/kernel/trace/helper_latency_hist.h
++++ linux-7.0.1-rt2/kernel/trace/helper_latency_hist.h
 @@ -0,0 +1,33 @@
 +#ifndef _LINUX_KERNEL_HELPER_LATENCY_HIST_H
 +#define _LINUX_KERNEL_HELPER_LATENCY_HIST_H
@@ -772,11 +763,10 @@ index 000000000000..310e85e7316b
 +	} while (0)
 +#endif
 +#endif /* _LINUX_KERNEL_HELPER_LATENCY_HIST_H */
-diff --git a/kernel/trace/latency_hist.c b/kernel/trace/latency_hist.c
-new file mode 100644
-index 000000000000..ebddab3e41fd
+Index: linux-7.0.1-rt2/kernel/trace/latency_hist.c
+===================================================================
 --- /dev/null
-+++ b/kernel/trace/latency_hist.c
++++ linux-7.0.1-rt2/kernel/trace/latency_hist.c
 @@ -0,0 +1,1639 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
@@ -2417,13 +2407,13 @@ index 000000000000..ebddab3e41fd
 +}
 +
 +device_initcall(latency_hist_init);
-diff --git a/kernel/trace/trace_irqsoff.c b/kernel/trace/trace_irqsoff.c
-index 781bf2fd0c41..9ba078600bc4 100644
---- a/kernel/trace/trace_irqsoff.c
-+++ b/kernel/trace/trace_irqsoff.c
-@@ -16,8 +16,10 @@
+Index: linux-7.0.1-rt2/kernel/trace/trace_irqsoff.c
+===================================================================
+--- linux-7.0.1-rt2.orig/kernel/trace/trace_irqsoff.c
++++ linux-7.0.1-rt2/kernel/trace/trace_irqsoff.c
+@@ -15,8 +15,10 @@
+ #include <linux/module.h>
  #include <linux/ftrace.h>
- #include <linux/irqstage.h>
  #include <linux/kprobes.h>
 +#include <trace/events/hist.h>
  
@@ -2432,7 +2422,7 @@ index 781bf2fd0c41..9ba078600bc4 100644
  
  #include <trace/events/preemptirq.h>
  
-@@ -467,12 +469,14 @@ void start_critical_timings(void)
+@@ -466,12 +468,14 @@ void start_critical_timings(void)
  {
  	if (preempt_trace(preempt_count()) || irq_trace())
  		start_critical_timing(CALLER_ADDR0, CALLER_ADDR1);
@@ -2447,7 +2437,7 @@ index 781bf2fd0c41..9ba078600bc4 100644
  	if (preempt_trace(preempt_count()) || irq_trace())
  		stop_critical_timing(CALLER_ADDR0, CALLER_ADDR1);
  }
-@@ -636,6 +640,7 @@ static void irqsoff_tracer_stop(struct trace_array *tr)
+@@ -635,6 +639,7 @@ static void irqsoff_tracer_stop(struct t
   */
  void tracer_hardirqs_on(unsigned long a0, unsigned long a1)
  {
@@ -2455,7 +2445,7 @@ index 781bf2fd0c41..9ba078600bc4 100644
  	if (!preempt_trace(preempt_count()) && irq_trace())
  		stop_critical_timing(a0, a1);
  }
-@@ -645,6 +650,7 @@ void tracer_hardirqs_off(unsigned long a0, unsigned long a1)
+@@ -644,6 +649,7 @@ void tracer_hardirqs_off(unsigned long a
  {
  	if (!preempt_trace(preempt_count()) && irq_trace())
  		start_critical_timing(a0, a1);
@@ -2463,13 +2453,13 @@ index 781bf2fd0c41..9ba078600bc4 100644
  }
  NOKPROBE_SYMBOL(tracer_hardirqs_off);
  
-diff --git a/kernel/trace/trace_preemptirq.c b/kernel/trace/trace_preemptirq.c
-index 54ec4a8c6b3a..dc96f7b1d0ad 100644
---- a/kernel/trace/trace_preemptirq.c
-+++ b/kernel/trace/trace_preemptirq.c
-@@ -13,40 +13,11 @@
+Index: linux-7.0.1-rt2/kernel/trace/trace_preemptirq.c
+===================================================================
+--- linux-7.0.1-rt2.orig/kernel/trace/trace_preemptirq.c
++++ linux-7.0.1-rt2/kernel/trace/trace_preemptirq.c
+@@ -12,40 +12,11 @@
+ #include <linux/kprobes.h>
  #include <linux/hardirq.h>
- #include <linux/irq_pipeline.h>
  #include "trace.h"
 +#include "helper_latency_hist.h"
  
@@ -2509,11 +2499,11 @@ index 54ec4a8c6b3a..dc96f7b1d0ad 100644
  #ifdef CONFIG_TRACE_IRQFLAGS
  /* Per-cpu variable to prevent redundant calls when IRQs already off */
  static DEFINE_PER_CPU(int, tracing_irq_cpu);
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index b77119d71641..e43381e089ed 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -6581,6 +6581,38 @@ void wq_worker_comm(char *buf, size_t size, struct task_struct *task)
+Index: linux-7.0.1-rt2/kernel/workqueue.c
+===================================================================
+--- linux-7.0.1-rt2.orig/kernel/workqueue.c
++++ linux-7.0.1-rt2/kernel/workqueue.c
+@@ -6593,6 +6593,38 @@ void wq_worker_comm(char *buf, size_t si
  	mutex_unlock(&wq_pool_attach_mutex);
  }
  
@@ -2552,6 +2542,3 @@ index b77119d71641..e43381e089ed 100644
  #ifdef CONFIG_SMP
  
  /*
--- 
-2.43.0
-

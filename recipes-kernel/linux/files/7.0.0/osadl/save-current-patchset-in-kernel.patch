@@ -1,7 +1,6 @@
-From 4baa76b1752054063d240669117221aff5d353d6 Mon Sep 17 00:00:00 2001
+Subject: Save the current patchset in the kernel
 From: Carsten Emde <C.Emde@osadl.org>
-Date: Wed, 9 Jan 2013 08:44:49 +0100
-Subject: [PATCH 4/5] Save the current patchset in the kernel
+Date: Wed,  9 Jan 2013 08:44:49 +0100
 
 In the good old days when only a small number of computer boards were
 released per year and mainline kernel support was available for most of
@@ -38,22 +37,20 @@ entirely fulfill the disclosure obligations of the GPL, but it certainly
 is much better than making available nothing.
 
 Signed-off-by: Carsten Emde <C.Emde@osadl.org>
----
- init/Kconfig               |  45 +++++++++++++++++
- kernel/Makefile            |  17 +++++++
- kernel/patchset.c          | 100 +++++++++++++++++++++++++++++++++++++
- scripts/Makefile           |   1 +
- scripts/bin2c.c            |  36 +++++++++++++
- scripts/extract-ikpatchset |  68 +++++++++++++++++++++++++
- 6 files changed, 267 insertions(+)
- create mode 100644 kernel/patchset.c
- create mode 100644 scripts/bin2c.c
- create mode 100644 scripts/extract-ikpatchset
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 444ce811ea67..4fdbd1d83528 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
+---
+ init/Kconfig               |   45 ++++++++++++++++++++
+ kernel/Makefile            |   17 +++++++
+ kernel/patchset.c          |  100 +++++++++++++++++++++++++++++++++++++++++++++
+ scripts/Makefile           |    1 
+ scripts/bin2c.c            |   36 ++++++++++++++++
+ scripts/extract-ikpatchset |   68 ++++++++++++++++++++++++++++++
+ 6 files changed, 267 insertions(+)
+
+Index: linux-7.0-rc1-rt1/init/Kconfig
+===================================================================
+--- linux-7.0-rc1-rt1.orig/init/Kconfig
++++ linux-7.0-rc1-rt1/init/Kconfig
 @@ -764,6 +764,10 @@ config CPU_ISOLATION
  
  source "kernel/rcu/Kconfig"
@@ -113,10 +110,10 @@ index 444ce811ea67..4fdbd1d83528 100644
  config IKHEADERS
  	tristate "Enable kernel headers through /sys/kernel/kheaders.tar.xz"
  	depends on SYSFS
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 6785982013dc..6904a68a69d6 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
+Index: linux-7.0-rc1-rt1/kernel/Makefile
+===================================================================
+--- linux-7.0-rc1-rt1.orig/kernel/Makefile
++++ linux-7.0-rc1-rt1/kernel/Makefile
 @@ -92,6 +92,7 @@ obj-$(CONFIG_UTS_NS) += utsname.o
  obj-$(CONFIG_USER_NS) += user_namespace.o
  obj-$(CONFIG_PID_NS) += pid_namespace.o
@@ -148,11 +145,10 @@ index 6785982013dc..6904a68a69d6 100644
  # kheaders_data.tar.xz
  $(obj)/kheaders.o: $(obj)/kheaders_data.tar.xz
  
-diff --git a/kernel/patchset.c b/kernel/patchset.c
-new file mode 100644
-index 000000000000..a6d7a2f318e5
+Index: linux-7.0-rc1-rt1/kernel/patchset.c
+===================================================================
 --- /dev/null
-+++ b/kernel/patchset.c
++++ linux-7.0-rc1-rt1/kernel/patchset.c
 @@ -0,0 +1,100 @@
 +/*
 + * kernel/patchset.c
@@ -254,10 +250,10 @@ index 000000000000..a6d7a2f318e5
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Carsten Emde");
 +MODULE_DESCRIPTION("Save the current patchset in the kernel");
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 0941e5ce7b57..7c97a575cd4c 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
+Index: linux-7.0-rc1-rt1/scripts/Makefile
+===================================================================
+--- linux-7.0-rc1-rt1.orig/scripts/Makefile
++++ linux-7.0-rc1-rt1/scripts/Makefile
 @@ -6,6 +6,7 @@
  hostprogs-always-$(CONFIG_KALLSYMS)			+= kallsyms
  hostprogs-always-$(BUILD_C_RECORDMCOUNT)		+= recordmcount
@@ -266,11 +262,10 @@ index 0941e5ce7b57..7c97a575cd4c 100644
  hostprogs-always-$(CONFIG_ASN1)				+= asn1_compiler
  hostprogs-always-$(CONFIG_MODULE_SIG_FORMAT)		+= sign-file
  hostprogs-always-$(CONFIG_SYSTEM_EXTRA_CERTIFICATE)	+= insert-sys-cert
-diff --git a/scripts/bin2c.c b/scripts/bin2c.c
-new file mode 100644
-index 000000000000..7e9dcb8b347e
+Index: linux-7.0-rc1-rt1/scripts/bin2c.c
+===================================================================
 --- /dev/null
-+++ b/scripts/bin2c.c
++++ linux-7.0-rc1-rt1/scripts/bin2c.c
 @@ -0,0 +1,36 @@
 +/*
 + * Unloved program to convert a binary on stdin to a C include on stdout
@@ -308,11 +303,10 @@ index 000000000000..7e9dcb8b347e
 +
 +        return 0;
 +}
-diff --git a/scripts/extract-ikpatchset b/scripts/extract-ikpatchset
-new file mode 100644
-index 000000000000..6ea604c8b509
+Index: linux-7.0-rc1-rt1/scripts/extract-ikpatchset
+===================================================================
 --- /dev/null
-+++ b/scripts/extract-ikpatchset
++++ linux-7.0-rc1-rt1/scripts/extract-ikpatchset
 @@ -0,0 +1,68 @@
 +#!/bin/sh
 +# ----------------------------------------------------------------------
@@ -382,6 +376,3 @@ index 000000000000..6ea604c8b509
 +# Bail out:
 +echo "$me: Cannot find kernel patchset." >&2
 +exit 1
--- 
-2.43.0
-
