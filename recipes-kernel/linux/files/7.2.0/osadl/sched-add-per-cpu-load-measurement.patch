@@ -45,11 +45,11 @@ Signed-off-by: Carsten Emde <C.Emde@osadl.org>
  kernel/sched/sched.h           |    8 +
  5 files changed, 296 insertions(+)
 
-Index: linux-7.0.1-rt2/init/Kconfig
-===================================================================
---- linux-7.0.1-rt2.orig/init/Kconfig
-+++ linux-7.0.1-rt2/init/Kconfig
-@@ -664,6 +664,34 @@ config BSD_PROCESS_ACCT_V3
+diff --git a/init/Kconfig b/init/Kconfig
+index 95e7ed13f62f..492793b41344 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -676,6 +676,34 @@ config BSD_PROCESS_ACCT_V3
  	  for processing it. A preliminary version of these tools is available
  	  at <http://www.gnu.org/software/acct/>.
  
@@ -84,23 +84,23 @@ Index: linux-7.0.1-rt2/init/Kconfig
  config TASKSTATS
  	bool "Export task/process statistics through netlink"
  	depends on NET
-Index: linux-7.0.1-rt2/kernel/sched/Makefile
-===================================================================
---- linux-7.0.1-rt2.orig/kernel/sched/Makefile
-+++ linux-7.0.1-rt2/kernel/sched/Makefile
+diff --git a/kernel/sched/Makefile b/kernel/sched/Makefile
+index b1f1a367034f..5da1e899e117 100644
+--- a/kernel/sched/Makefile
++++ b/kernel/sched/Makefile
 @@ -40,3 +40,5 @@ obj-y += core.o
  obj-y += fair.o
  obj-y += build_policy.o
  obj-y += build_utility.o
 +obj-y += cpu_idleruntime.o
 +
-Index: linux-7.0.1-rt2/kernel/sched/core.c
-===================================================================
---- linux-7.0.1-rt2.orig/kernel/sched/core.c
-+++ linux-7.0.1-rt2/kernel/sched/core.c
-@@ -5088,6 +5088,37 @@ prepare_task_switch(struct rq *rq, struc
- 	kmap_local_sched_out();
- 	prepare_task(next);
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 3ec77a682c4a..179bc1026b88 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -5307,6 +5307,37 @@ prepare_task_switch(struct rq *rq, struct task_struct *prev,
+ 	 */
+ 	hard_cond_local_irq_disable();
  	prepare_arch_switch(next);
 +#ifdef CONFIG_CPU_IDLERUNTIME
 +	if (is_idle_task(next)) {
@@ -136,10 +136,11 @@ Index: linux-7.0.1-rt2/kernel/sched/core.c
  }
  
  /**
-Index: linux-7.0.1-rt2/kernel/sched/cpu_idleruntime.c
-===================================================================
+diff --git a/kernel/sched/cpu_idleruntime.c b/kernel/sched/cpu_idleruntime.c
+new file mode 100644
+index 000000000000..e6747e0ba4f6
 --- /dev/null
-+++ linux-7.0.1-rt2/kernel/sched/cpu_idleruntime.c
++++ b/kernel/sched/cpu_idleruntime.c
 @@ -0,0 +1,227 @@
 +/*
 +   cpu_idleruntime.c: provide CPU usage data based on idle processing
@@ -368,11 +369,11 @@ Index: linux-7.0.1-rt2/kernel/sched/cpu_idleruntime.c
 +}
 +
 +early_initcall(idleruntime_init);
-Index: linux-7.0.1-rt2/kernel/sched/sched.h
-===================================================================
---- linux-7.0.1-rt2.orig/kernel/sched/sched.h
-+++ linux-7.0.1-rt2/kernel/sched/sched.h
-@@ -2007,6 +2007,14 @@ static inline struct rq *_this_rq_lock_i
+diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+index f9d99a3d412e..7be4d2b1b1b5 100644
+--- a/kernel/sched/sched.h
++++ b/kernel/sched/sched.h
+@@ -2051,6 +2051,14 @@ static inline struct rq *_this_rq_lock_irq(struct rq_flags *rf) __acquires_ret
  	return rq;
  }
  

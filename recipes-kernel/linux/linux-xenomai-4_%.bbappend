@@ -6,7 +6,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.0.0/osadl:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.2.0/osadl:"
 require osadl-patches.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
@@ -15,4 +15,7 @@ SRC_URI:append:rpi4 = " file://rpi4-nopm.cfg"
 
 SRC_URI += "${@'file://dbg.cfg' if d.getVar('XENOMAI_DEBUG') == '1' else ''}"
 
-SRCREV = "e0f16425093bdecb38aa435434aa2149b1efe7a4"
+# v7.2-evl1-rebase tag, carries riscv support
+GIT_BRANCH = "v7.2-evl-rebase"
+GIT_BRANCH:riscv64 = "v7.2-evl-rebase"
+SRCREV = "226f2e3ad97c7bc0347709bd94ac4f5990a6bd89"

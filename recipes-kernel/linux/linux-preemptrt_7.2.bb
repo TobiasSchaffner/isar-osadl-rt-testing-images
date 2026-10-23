@@ -8,17 +8,17 @@
 
 inherit linux-kernel
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.0.0/osadl:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.2.0/osadl:"
 require osadl-patches.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI += "git://gitlab.com/Xenomai/xenomai4/linux-evl.git;protocol=https;branch=wip/evl-riscv;destsuffix=linux-preemptrt-${PV} \
+SRC_URI += "git://gitlab.com/Xenomai/xenomai4/linux-evl.git;protocol=https;branch=v7.2-evl-rebase;destsuffix=linux-preemptrt-${PV} \
             file://preempt-rt.cfg \
             file://realtime.cfg"
 SRC_URI:append:rpi4 = " file://rpi4-nopm.cfg"
 
-SRCREV = "e0f16425093bdecb38aa435434aa2149b1efe7a4"
+SRCREV = "226f2e3ad97c7bc0347709bd94ac4f5990a6bd89"
 
 S = "${WORKDIR}/linux-preemptrt-${PV}"
 

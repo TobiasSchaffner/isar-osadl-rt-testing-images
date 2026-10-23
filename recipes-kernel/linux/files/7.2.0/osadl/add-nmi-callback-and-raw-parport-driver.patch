@@ -26,11 +26,11 @@ Signed-off-by: Carsten Emde <C.Emde@osadl.org>
  kernel/trace/trace_syscalls.c |    3 
  11 files changed, 559 insertions(+)
 
-Index: linux-7.0.1-rt2/drivers/misc/Kconfig
-===================================================================
---- linux-7.0.1-rt2.orig/drivers/misc/Kconfig
-+++ linux-7.0.1-rt2/drivers/misc/Kconfig
-@@ -643,6 +643,72 @@ config MCHP_LAN966X_PCI
+diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
+index 390256ed91f4..aeaa7bedb91e 100644
+--- a/drivers/misc/Kconfig
++++ b/drivers/misc/Kconfig
+@@ -634,6 +634,72 @@ config MCHP_LAN966X_PCI
  	    - lan966x-miim (MDIO_MSCC_MIIM)
  	    - lan966x-switch (LAN966X_SWITCH)
  
@@ -103,11 +103,11 @@ Index: linux-7.0.1-rt2/drivers/misc/Kconfig
  source "drivers/misc/c2port/Kconfig"
  source "drivers/misc/eeprom/Kconfig"
  source "drivers/misc/cb710/Kconfig"
-Index: linux-7.0.1-rt2/drivers/misc/Makefile
-===================================================================
---- linux-7.0.1-rt2.orig/drivers/misc/Makefile
-+++ linux-7.0.1-rt2/drivers/misc/Makefile
-@@ -39,6 +39,7 @@ obj-$(CONFIG_C2PORT)		+= c2port/
+diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
+index fed47c7672b9..9739266ed803 100644
+--- a/drivers/misc/Makefile
++++ b/drivers/misc/Makefile
+@@ -38,6 +38,7 @@ obj-$(CONFIG_C2PORT)		+= c2port/
  obj-$(CONFIG_HMC6352)		+= hmc6352.o
  obj-y				+= eeprom/
  obj-y				+= cb710/
@@ -115,10 +115,11 @@ Index: linux-7.0.1-rt2/drivers/misc/Makefile
  obj-$(CONFIG_VMWARE_BALLOON)	+= vmw_balloon.o
  obj-$(CONFIG_PCH_PHUB)		+= pch_phub.o
  obj-y				+= lis3lv02d/
-Index: linux-7.0.1-rt2/drivers/misc/setparport.c
-===================================================================
+diff --git a/drivers/misc/setparport.c b/drivers/misc/setparport.c
+new file mode 100644
+index 000000000000..8f521b96f0c6
 --- /dev/null
-+++ linux-7.0.1-rt2/drivers/misc/setparport.c
++++ b/drivers/misc/setparport.c
 @@ -0,0 +1,468 @@
 +/*
 + * setparport - set bits of the parallel port by writing immediately
@@ -588,22 +589,22 @@ Index: linux-7.0.1-rt2/drivers/misc/setparport.c
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Carsten Emde <C.Emde@osadl.org>");
 +MODULE_DESCRIPTION("Install NMI call and set/get parallel port w/o device IRQ");
-Index: linux-7.0.1-rt2/fs/super.c
-===================================================================
---- linux-7.0.1-rt2.orig/fs/super.c
-+++ linux-7.0.1-rt2/fs/super.c
-@@ -1184,6 +1184,7 @@ static inline bool get_active_super(stru
+diff --git a/fs/super.c b/fs/super.c
+index ffdcc6a2e0de..f56d6822adb7 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1081,6 +1081,7 @@ void emergency_remount(void)
+ 		schedule_work(work);
  	}
- 	return active;
  }
 +EXPORT_SYMBOL(emergency_remount);
  
- static const char *filesystems_freeze_ptr = "filesystems_freeze";
- 
-Index: linux-7.0.1-rt2/fs/sync.c
-===================================================================
---- linux-7.0.1-rt2.orig/fs/sync.c
-+++ linux-7.0.1-rt2/fs/sync.c
+ static inline bool get_active_super(struct super_block *sb)
+ {
+diff --git a/fs/sync.c b/fs/sync.c
+index 4a84dd837b86..ee7533706794 100644
+--- a/fs/sync.c
++++ b/fs/sync.c
 @@ -141,6 +141,8 @@ void emergency_sync(void)
  		schedule_work(work);
  	}
@@ -613,11 +614,11 @@ Index: linux-7.0.1-rt2/fs/sync.c
  
  /*
   * sync a single super
-Index: linux-7.0.1-rt2/include/linux/hardirq.h
-===================================================================
---- linux-7.0.1-rt2.orig/include/linux/hardirq.h
-+++ linux-7.0.1-rt2/include/linux/hardirq.h
-@@ -101,6 +101,8 @@ void irq_exit_rcu(void);
+diff --git a/include/linux/hardirq.h b/include/linux/hardirq.h
+index 2ba79d08005c..06e60ec68264 100644
+--- a/include/linux/hardirq.h
++++ b/include/linux/hardirq.h
+@@ -102,6 +102,8 @@ void irq_exit_rcu(void);
   * be marked 'notrace' and call nmi_enter() as soon as possible.
   */
  
@@ -626,7 +627,7 @@ Index: linux-7.0.1-rt2/include/linux/hardirq.h
  /*
   * nmi_enter() can nest up to 15 times; see NMI_BITS.
   */
-@@ -110,6 +112,8 @@ void irq_exit_rcu(void);
+@@ -111,6 +113,8 @@ void irq_exit_rcu(void);
  		arch_nmi_enter();				\
  		BUG_ON(in_nmi() == NMI_MASK);			\
  		__preempt_count_add(NMI_OFFSET + HARDIRQ_OFFSET);	\
@@ -635,21 +636,21 @@ Index: linux-7.0.1-rt2/include/linux/hardirq.h
  	} while (0)
  
  #define nmi_enter()						\
-Index: linux-7.0.1-rt2/include/linux/interrupt.h
-===================================================================
---- linux-7.0.1-rt2.orig/include/linux/interrupt.h
-+++ linux-7.0.1-rt2/include/linux/interrupt.h
-@@ -878,4 +878,6 @@ extern int arch_early_irq_init(void);
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index 2f0cb7ee7221..e42b7e2a216e 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -911,4 +911,6 @@ extern int arch_early_irq_init(void);
  
  #define __softirq_entry  __section(".softirqentry.text")
  
 +void set_nmicallback(void (*new_nmicallback)(void));
 +
  #endif
-Index: linux-7.0.1-rt2/kernel/irq/handle.c
-===================================================================
---- linux-7.0.1-rt2.orig/kernel/irq/handle.c
-+++ linux-7.0.1-rt2/kernel/irq/handle.c
+diff --git a/kernel/irq/handle.c b/kernel/irq/handle.c
+index 328322bcfdb9..d4201bb0a3cb 100644
+--- a/kernel/irq/handle.c
++++ b/kernel/irq/handle.c
 @@ -17,6 +17,10 @@
  #include <asm/irq_regs.h>
  
@@ -661,11 +662,11 @@ Index: linux-7.0.1-rt2/kernel/irq/handle.c
  
  #include "internals.h"
  
-Index: linux-7.0.1-rt2/kernel/irq/manage.c
-===================================================================
---- linux-7.0.1-rt2.orig/kernel/irq/manage.c
-+++ linux-7.0.1-rt2/kernel/irq/manage.c
-@@ -2781,6 +2781,13 @@ bool irq_has_action(unsigned int irq)
+diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+index 1c1920f5fbc0..9a8e2c46c628 100644
+--- a/kernel/irq/manage.c
++++ b/kernel/irq/manage.c
+@@ -2881,6 +2881,13 @@ bool irq_has_action(unsigned int irq)
  }
  EXPORT_SYMBOL_GPL(irq_has_action);
  
@@ -679,11 +680,11 @@ Index: linux-7.0.1-rt2/kernel/irq/manage.c
  /**
   * irq_check_status_bit - Check whether bits in the irq descriptor status are set
   * @irq:	The linux irq number
-Index: linux-7.0.1-rt2/kernel/sched/syscalls.c
-===================================================================
---- linux-7.0.1-rt2.orig/kernel/sched/syscalls.c
-+++ linux-7.0.1-rt2/kernel/sched/syscalls.c
-@@ -1342,6 +1342,7 @@ static void do_sched_yield(void)
+diff --git a/kernel/sched/syscalls.c b/kernel/sched/syscalls.c
+index b215b0ead9a6..ef6e0dd36500 100644
+--- a/kernel/sched/syscalls.c
++++ b/kernel/sched/syscalls.c
+@@ -1348,6 +1348,7 @@ static void do_sched_yield(void)
  
  	schedule();
  }
@@ -691,10 +692,10 @@ Index: linux-7.0.1-rt2/kernel/sched/syscalls.c
  
  /**
   * sys_sched_yield - yield the current processor to other threads.
-Index: linux-7.0.1-rt2/kernel/trace/trace_syscalls.c
-===================================================================
---- linux-7.0.1-rt2.orig/kernel/trace/trace_syscalls.c
-+++ linux-7.0.1-rt2/kernel/trace/trace_syscalls.c
+diff --git a/kernel/trace/trace_syscalls.c b/kernel/trace/trace_syscalls.c
+index 8a4f3c75e39f..9f652c09caf5 100644
+--- a/kernel/trace/trace_syscalls.c
++++ b/kernel/trace/trace_syscalls.c
 @@ -14,6 +14,9 @@
  #include "trace_output.h"
  #include "trace.h"
