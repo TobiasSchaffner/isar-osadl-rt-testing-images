@@ -16,6 +16,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "git://gitlab.com/Xenomai/xenomai4/linux-evl.git;protocol=https;branch=wip/evl-riscv;destsuffix=linux-preemptrt-${PV} \
             file://preempt-rt.cfg \
             file://realtime.cfg"
+SRC_URI:append:rpi4 = " file://rpi4-nopm.cfg"
 
 SRCREV = "e0f16425093bdecb38aa435434aa2149b1efe7a4"
 

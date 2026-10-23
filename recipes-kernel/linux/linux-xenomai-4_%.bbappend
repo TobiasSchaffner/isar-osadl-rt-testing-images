@@ -11,6 +11,7 @@ require osadl-patches.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "file://realtime.cfg"
+SRC_URI:append:rpi4 = " file://rpi4-nopm.cfg"
 
 SRC_URI += "${@'file://dbg.cfg' if d.getVar('XENOMAI_DEBUG') == '1' else ''}"
 
