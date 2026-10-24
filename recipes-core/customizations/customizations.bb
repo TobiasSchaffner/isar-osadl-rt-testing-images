@@ -40,3 +40,10 @@ do_install() {
 
     echo "${MACHINE_HOSTNAME}" > ${D}/etc/hostname
 }
+
+SRC_URI:append:rpi4 = " file://99-dev-root.rules"
+
+do_install:append:rpi4() {
+    install -v -d ${D}/etc/udev/rules.d/
+    install -v -m 644 ${WORKDIR}/99-dev-root.rules ${D}/etc/udev/rules.d/
+}

@@ -1,0 +1,3 @@
+# The rpi4 boots without initramfs, so / is mounted as the nonexistent /dev/root
+# and stress-ng --rawdev cannot find the disk. Partition 2 is the rootfs.
+SUBSYSTEM=="block", KERNEL=="mmcblk[0-9]p2", SYMLINK+="root"
