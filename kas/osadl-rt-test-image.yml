@@ -40,6 +40,11 @@ local_conf_header:
     ISAR_CROSS_COMPILE = "1"
   ccache: |
     USE_CCACHE = "1"
+  apt-snapshot: |
+    # Frozen Debian package versions, so a rebuild resolves to the same packages
+    ISAR_USE_APT_SNAPSHOT = "1"
+    ISAR_APT_SNAPSHOT_DATE = "20261026T082512Z"
+    ISAR_APT_SNAPSHOT_DATE[security] = "20261026T044319Z"
   tuning: |
     IMAGE_KERNEL_CMDLINE_TUNE = "isolcpus=2-3 rcu_nocbs=2-3 nohz_full=2-3 irqaffinity=0-1 tsc=nowatchdog nosoftlockup audit=0"
   users: |
