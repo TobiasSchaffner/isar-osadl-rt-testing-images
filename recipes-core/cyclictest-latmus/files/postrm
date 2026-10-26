@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
+	dpkg-divert --package cyclictest-latmus --remove --rename \
+		--divert /usr/bin/cyclictest.rt-tests /usr/bin/cyclictest
+fi
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+# rt-tests ships its own /usr/bin/cyclictest; keep it as cyclictest.rt-tests
+# so that the wrapper is the cyclictest on EVL images
+if [ "$1" = "install" ] || [ "$1" = "upgrade" ]; then
+	dpkg-divert --package cyclictest-latmus --add --rename \
+		--divert /usr/bin/cyclictest.rt-tests /usr/bin/cyclictest
+fi
+
+#DEBHELPER#
+
+exit 0

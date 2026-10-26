@@ -9,4 +9,4 @@
 require osadl-rt-test-image-common.inc
 
 # Realtime tooling
-IMAGE_PREINSTALL += "rt-tests jitterdebugger stress-ng"
+IMAGE_PREINSTALL += "jitterdebugger"

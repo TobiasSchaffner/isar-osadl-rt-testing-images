@@ -10,7 +10,7 @@ inherit dpkg-raw
 
 DESCRIPTION = "cyclictest-compatible wrapper using latmus (EVL/Xenomai 4)"
 
-SRC_URI = "file://cyclictest-latmus"
+SRC_URI = "file://cyclictest-latmus file://preinst file://postrm"
 
 DEBIAN_DEPENDS = "python3, libevl"
 

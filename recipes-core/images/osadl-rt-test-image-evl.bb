@@ -10,6 +10,9 @@ require osadl-rt-test-image-common.inc
 
 IMAGE_PREINSTALL += "stress-ng"
 
+# hackbench; its cyclictest is diverted by cyclictest-latmus
+IMAGE_PREINSTALL += "rt-tests"
+
 # Realtime tooling
 IMAGE_INSTALL += "libevl-test"
 IMAGE_INSTALL += "cyclictest-latmus"
