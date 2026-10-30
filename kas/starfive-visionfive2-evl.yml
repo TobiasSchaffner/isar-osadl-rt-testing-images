@@ -9,15 +9,15 @@
 header:
   version: 10
   includes:
-    - kas/osadl-rt-test-image.yml
+    - kas/rt-test-image.yml
 
 machine: starfive-visionfive2
-target: osadl-rt-test-image-evl
-distro: osadl-rt-test-xenomai
+target: rt-test-image-evl
+distro: rt-test-xenomai
 
 local_conf_header:
   hostname: |
-    MACHINE_HOSTNAME = "osadl-rt-test-starfive-visionfive2-evl"
+    MACHINE_HOSTNAME = "rt-test-starfive-visionfive2-evl"
   wks: |
     WKS_FILE_NAME = "starfive-visionfive2.wks.in"
   kernel: |

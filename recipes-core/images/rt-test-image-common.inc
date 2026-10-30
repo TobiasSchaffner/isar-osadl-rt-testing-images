@@ -14,7 +14,7 @@ IMAGE_INSTALL += "unix-bench"
 # Common tooling
 IMAGE_PREINSTALL += "vim openssh-server htop iperf3"
 
-# OSADL test image requirements
+# Test image requirements
 IMAGE_PREINSTALL += "\
     bc \
     bison \

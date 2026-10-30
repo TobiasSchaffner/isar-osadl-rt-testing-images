@@ -6,15 +6,15 @@
 header:
   version: 10
   includes:
-    - kas/osadl-rt-test-image.yml
+    - kas/rt-test-image.yml
 
 machine: rpi4
 distro: debian-trixie
-target: osadl-rt-test-image-preempt-rt
+target: rt-test-image-preempt-rt
 
 local_conf_header:
   hostname: |
-    MACHINE_HOSTNAME = "osadl-rt-test-rpi4-preemptrt"
+    MACHINE_HOSTNAME = "rt-test-rpi4-preemptrt"
   wks: |
     WKS_FILE = "rpi4.wks"
   kernel: |

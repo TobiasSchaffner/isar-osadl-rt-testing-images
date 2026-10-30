@@ -6,7 +6,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-require osadl-rt-test-image-common.inc
+require rt-test-image-common.inc
 
 # Realtime tooling
 IMAGE_PREINSTALL += "jitterdebugger"
