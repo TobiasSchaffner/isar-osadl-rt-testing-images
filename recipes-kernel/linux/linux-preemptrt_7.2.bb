@@ -8,9 +8,6 @@
 
 inherit linux-kernel
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/files/7.2.0/osadl:"
-require osadl-patches.inc
-
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += "git://gitlab.com/Xenomai/xenomai4/linux-evl.git;protocol=https;branch=v7.2-evl-rebase;destsuffix=linux-preemptrt-${PV} \

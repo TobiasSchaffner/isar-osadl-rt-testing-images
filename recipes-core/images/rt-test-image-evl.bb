@@ -6,12 +6,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-require osadl-rt-test-image-common.inc
-
-IMAGE_PREINSTALL += "stress-ng"
-
-# hackbench; its cyclictest is diverted by cyclictest-latmus
-IMAGE_PREINSTALL += "rt-tests"
+require rt-test-image-common.inc
 
 # Realtime tooling
 IMAGE_INSTALL += "libevl-test"

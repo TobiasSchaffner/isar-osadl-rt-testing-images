@@ -9,15 +9,15 @@
 header:
   version: 10
   includes:
-    - kas/osadl-rt-test-image.yml
+    - kas/rt-test-image.yml
 
 machine: rpi4
-target: osadl-rt-test-image-evl
-distro: osadl-rt-test-xenomai
+target: rt-test-image-evl
+distro: rt-test-xenomai
 
 local_conf_header:
   hostname: |
-    MACHINE_HOSTNAME = "osadl-rt-test-rpi4-evl"
+    MACHINE_HOSTNAME = "rt-test-rpi4-evl"
   kernel: |
     KERNEL_NAME = "xenomai-4"
     PREFERRED_VERSION_linux-xenomai-4 = "7.2"

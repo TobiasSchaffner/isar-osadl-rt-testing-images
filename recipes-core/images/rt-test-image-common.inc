@@ -10,6 +10,7 @@ require recipes-core/images/isar-image-base.bb
 IMAGE_INSTALL += "customizations sshd-regen-keys expand-on-first-boot"
 
 IMAGE_INSTALL += "unix-bench"
+IMAGE_PREINSTALL += "rt-tests stress-ng"
 
 # Memory-interference analysis (paper, Section VI-B)
 IMAGE_INSTALL += "isolbench"
@@ -19,7 +20,7 @@ IMAGE_INSTALL:append:starfive-visionfive2 = " visionfive2-memlat-tools"
 # Common tooling
 IMAGE_PREINSTALL += "vim openssh-server htop iperf3"
 
-# OSADL test image requirements
+# Test image requirements
 IMAGE_PREINSTALL += "\
     bc \
     bison \

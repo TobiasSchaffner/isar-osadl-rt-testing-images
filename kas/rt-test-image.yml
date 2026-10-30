@@ -12,7 +12,7 @@ header:
 build_system: isar
 
 repos:
-  isar-osadl-rt-testing-images:
+  isar-rt-testing-images:
 
   isar:
     url: https://github.com/ilbers/isar.git
@@ -23,17 +23,17 @@ repos:
     patches:
       0001-starfive-visionfive2-Allow-kernel-commandline-tuning.patch:
         path: isar-patches/0001-starfive-visionfive2-Allow-kernel-commandline-tuning.patch
-        repo: isar-osadl-rt-testing-images
+        repo: isar-rt-testing-images
   xenomai-images:
     url: https://gitlab.com/Xenomai/xenomai-images.git
     commit: 74664edd99cb44c830060207c4dcf5c9ff83c341
     patches:
       0001-Allow-to-tune-the-rpi4-commandline.patch:
         path: xenomai-images-patches/0001-Allow-to-tune-the-rpi4-commandline.patch
-        repo: isar-osadl-rt-testing-images
+        repo: isar-rt-testing-images
       0001-allow-custom-kernel.patch:
         path: xenomai-images-patches/0001-allow-custom-kernel.patch
-        repo: isar-osadl-rt-testing-images
+        repo: isar-rt-testing-images
 
 local_conf_header:
   cross: |

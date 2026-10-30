@@ -1,6 +1,6 @@
 # Real-Time Linux evaluation images
 
-This isar layer allows to build debian based real-time evaluation images for the StarFive VisionFive2 and the Raspberry Pi 4, using either PREEMPT_RT or EVL (Xenomai 4) from pinned inputs.
+This isar layer allows to build debian based real-time evaluation images for the StarFive VisionFive2 and the Raspberry Pi 4, using either PREEMPT_RT or EVL (Xenomai 4) from pinned inputs. Debian packages downloaded from upstream are pinned to the Debian Snapshot defined in ISAR_APT_SNAPSHOT_DATE all custom build packages are pinned with a sha256sum in this repository or in one the the included isar layers.
 
 The images include:
  * A custom kernel with the PREEMPT_RT patch or EVL (Dovetail) applied
