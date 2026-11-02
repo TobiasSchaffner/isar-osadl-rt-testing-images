@@ -1,0 +1,14 @@
+Source: ${PN}
+Section: misc
+Priority: optional
+Standards-Version: 3.9.6
+Maintainer: Tobias Schaffner <tobias.schaffner@siemens.com>
+Build-Depends: ${DEBIAN_BUILD_DEPENDS}
+
+Package: isolbench
+Architecture: ${DISTRO_ARCH}
+Description: ${DESCRIPTION}
+ The Latency benchmark of IsolBench follows a randomly shuffled linked list
+ through a buffer and reports the average access latency. It is installed
+ as isolbench-latency.
+Depends: ${shlibs:Depends}, ${misc:Depends}

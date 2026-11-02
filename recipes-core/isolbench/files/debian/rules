@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+# Only the latency probe; the upstream Makefile uses -march=native, which
+# does not work for a cross build.
+override_dh_auto_build:
+	$(DEB_HOST_GNU_TYPE)-gcc -O2 -Wall -o bench/latency bench/latency.c
+
+override_dh_auto_install:
+	install -D -m 0755 bench/latency debian/isolbench/usr/bin/isolbench-latency
+	install -D -m 0644 LICENSE debian/isolbench/usr/share/doc/isolbench/copyright
+
+override_dh_auto_clean:
+	rm -f bench/latency
+
+override_dh_auto_test:
+
+%:
+	dh $@

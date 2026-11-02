@@ -21,3 +21,9 @@ if [ -w "/etc/default/ntpsec" ]; then
    sed -i 's|NTPD_OPTS="-g -N"|NTPD_OPTS="-g"|g' /etc/default/ntpsec
    sed -i 's|IGNORE_DHCP=""|IGNORE_DHCP="yes"|g' /etc/default/ntpsec
 fi
+
+# The boards have no RTC and boot with a clock months off. openntpd only
+# slews by default and gives up on such offsets, so let it step at startup.
+if [ -w "/etc/default/openntpd" ]; then
+   sed -i 's|^DAEMON_OPTS="-f|DAEMON_OPTS="-s -f|' /etc/default/openntpd
+fi

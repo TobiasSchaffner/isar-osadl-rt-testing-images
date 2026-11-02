@@ -19,7 +19,8 @@ DEBIAN_DEPENDS = "ifupdown, \
                   isc-dhcp-client, \
                   net-tools, \
                   iputils-ping, \
-                  ssh"
+                  ssh, \
+                  openntpd"
 
 DEBIAN_DEPENDS:debian-sid-ports = "ifupdown, \
                                    isc-dhcp-client, \

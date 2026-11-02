@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+TOOLS = aggr l2pmu memlat-dist memlat-probe memreg pfctl waymask
+LIBDIR = debian/visionfive2-memlat-tools/usr/lib/visionfive2-memlat-tools
+
+override_dh_auto_build:
+	for t in $(TOOLS); do \
+		$(DEB_HOST_GNU_TYPE)-gcc -O2 -Wall -o $$t $$t.c || exit 1; \
+	done
+
+# The tools and memlat.py share one directory, because the tests call the
+# tools as ./<tool>; visionfive2-memlat-tools runs them from a work directory linking there.
+override_dh_auto_install:
+	install -d $(LIBDIR) debian/visionfive2-memlat-tools/usr/bin
+	install -m 0755 $(TOOLS) memlat.py $(LIBDIR)/
+	ln -s ../lib/visionfive2-memlat-tools/memlat.py debian/visionfive2-memlat-tools/usr/bin/visionfive2-memlat-tools
+	for t in $(TOOLS); do ln -s ../lib/visionfive2-memlat-tools/$$t debian/visionfive2-memlat-tools/usr/bin/$$t; done
+
+override_dh_auto_clean:
+	rm -f $(TOOLS)
+
+override_dh_auto_test:
+
+%:
+	dh $@

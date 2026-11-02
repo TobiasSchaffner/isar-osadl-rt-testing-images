@@ -1,0 +1,18 @@
+Source: ${PN}
+Section: misc
+Priority: optional
+Standards-Version: 3.9.6
+Maintainer: Tobias Schaffner <tobias.schaffner@siemens.com>
+Build-Depends: ${DEBIAN_BUILD_DEPENDS}
+
+Package: visionfive2-memlat-tools
+Architecture: ${DISTRO_ARCH}
+Description: ${DESCRIPTION}
+ visionfive2-memlat-tools runs the memory-contention experiments
+ (visionfive2-memlat-tools -l lists them).
+ memlat-dist and memlat-probe time dependent loads, aggr generates memory
+ traffic with controlled locality and rate, and memreg is a polling
+ bandwidth regulator. pfctl, waymask and l2pmu access the L2 prefetchers,
+ the L2 way masks and the L2 event counters of the SiFive U74-MC through
+ /dev/mem and only work on the JH7110.
+Depends: ${shlibs:Depends}, ${misc:Depends}, stress-ng, rt-tests, isolbench, python3
