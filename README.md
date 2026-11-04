@@ -25,5 +25,3 @@ Supported targets:
 
 Optional overlays:
  * opt-debug - Enable EVL/kernel debug options
-
-Alternatively you can download the latest images from: https://github.com/TobiasSchaffner/isar-osadl-rt-testing-images/actions
